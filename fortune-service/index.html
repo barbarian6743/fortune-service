@@ -1,30 +1,57 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
-    <title>오늘의 운세</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>신비한 오늘의 운세</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
-<div class="container">
-    <h1>🔮 오늘의 운세</h1>
+    <div class="background-stars"></div>
+    <div class="container">
+        <header>
+            <h1>🔮 신비한 운세</h1>
+            <p class="subtitle">별들이 말해주는 당신의 오늘</p>
+        </header>
 
-    <label>성별</label>
-    <select id="gender">
-        <option value="">선택하세요</option>
-        <option value="male">남성</option>
-        <option value="female">여성</option>
-    </select>
+        <div class="input-group">
+            <label for="gender">성별</label>
+            <div class="select-wrapper">
+                <select id="gender">
+                    <option value="" disabled selected>선택해주세요</option>
+                    <option value="male">남성</option>
+                    <option value="female">여성</option>
+                </select>
+            </div>
+        </div>
 
-    <label>생년월일</label>
-    <input type="date" id="birth">
+        <div class="input-group">
+            <label for="birth">생년월일</label>
+            <input type="date" id="birth">
+        </div>
 
-    <button id="fortuneBtn">운세 보기</button>
+        <button id="fortuneBtn" class="magic-btn">
+            <span class="btn-text">운세 확인하기</span>
+            <span class="btn-particles">✨</span>
+        </button>
 
-    <div class="result" id="result"></div>
-</div>
+        <div id="loading" class="hidden">
+            <div class="spinner"></div>
+            <p>별들의 목소리를 듣는 중...</p>
+        </div>
 
-<script src="js/app.js"></script>
+        <div id="result" class="result-card hidden">
+            <!-- JS will populate this -->
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
 </body>
+
 </html>
