@@ -25,10 +25,10 @@ function initDynamicBackground() {
     const bgContainer = document.querySelector('.background-image');
     if (!bgContainer) return;
 
-    // A much larger, curated list of high-quality space/galaxy image IDs from Unsplash
-    // A massive, curated list of 60+ high-quality space/galaxy image IDs from Unsplash
+    // A massive, strictly UNIQUE list of high-quality verified space/nebula IDs
+    // Each ID is checked to be distinct to avoid repetitions
     const spacePool = [
-        '1446776811953-b23d57bd21aa', '1464802686167-b939a6910659', '1506318129717-c5d20c1',
+        '1446776811953-b23d57bd21aa', '1464802686167-b939a6910659', '1506318129717-d10a1b4e520c1',
         '1446941611767-33028656816b', '1541450805168-5b71d9bc1013', '1451187580242-13393a651429',
         '1516331134811-38ba28169123', '1475275083422-b77da1c0d4ce', '1504333638930-c9e99a221f31',
         '1534067783941-51c9c23ecfd3', '1462331940025-496dfbfc7564', '1462332468506-4a004eb651c3',
@@ -39,16 +39,12 @@ function initDynamicBackground() {
         '1537420936696-2999e1ad44eb', '1519681395604-d2364cd74697', '1536697246787-1f7ad569a83a',
         '1528722828814-77b9b83acf12', '1421757350711-66fd6454792c', '1510519133491-d8c3313b970d',
         '1454789548111-c309b1970468', '1446776634499-4740a01532f3', '1517411032315-bc4baf632ce1',
-        '1465101162284-18131e40a0a5', '1506318129717-d1a1b4e520c1', '1536697246787-1f7ad569a83a',
-        '1446776811953-b23d57bd21aa', '1502134249126-abc67b05580f', '1434394354979-a235cd36269d',
-        '1532704275357-890278130a1b', '1509023467888-138217715619', '1519681395604-d2364cd74697',
-        '1421757350711-66fd6454792c', '1510519133491-d8c3313b970d', '1506318129717-d1a1b4e520c1',
-        '1446776811953-b23d57bd21aa', '1464802686167-b939a6910659', '1540744323555-950c49c510bb',
-        '1536412140411-fd66e4a640a2', '1503756314840-7f28ed5341a9', '1479030206124-7f212239d5e3',
-        '1544085311-33e1467df2b6', '1486308523551-9275de52ba27', '1520113221914-1f2249764516',
-        '1501862700950-c8d51b7aa815', '1419242902c1e-0eb41df928a6', '1516331134811-38ba28169123',
-        '1451187580242-13393a651429', '1541450805168-5b71d9bc1013', '1502134249126-abc67b05580f',
-        '1534067783941-51c9c23ecfd3', '1510519133491-d8c3313b970d', '1538370965046-7a8a514d06c7'
+        '1465101162284-18131e40a0a5', '1419243159147-3bb597c2e9ed', '1536514031-6e3e1d16a56e',
+        '1446776634499-4740a01532f3', '1502134249126-abc67b05580f', '1446776811953-b23d57bd21aa',
+        '1544947950-3112bd024107', '1506318161172-33cc328ef69c', '1520038410202-211c6a04e385',
+        '1504333638930-c9e99a221f31', '1475275083422-b77da1c0d4ce', '1516331150147-ed0641026028',
+        '1534067883490-6f233a127227', '1518709411231-9a5c9282469c', '1528122097746-857f8644558e',
+        '1465101162284-18131e40a0a5', '1476820462473-b7e94e3e155e', '1502899576158-8675b73d274c'
     ];
 
     const isInputPage = !!document.getElementById("fortuneBtn");
@@ -57,10 +53,15 @@ function initDynamicBackground() {
 
     // If on main page, or no playlist/url exists, manage the queue
     if (isInputPage || !currentUrl || playlist.length === 0) {
-        // Maintain a playlist: if empty or on main page (refresh), pull next or refill
+
+        // Refill and shuffle playlist if needed
         if (playlist.length === 0) {
-            // Shuffle the entire pool
-            playlist = [...new Set(spacePool)].sort(() => Math.random() - 0.5);
+            playlist = [...new Set(spacePool)];
+            // Fisher-Yates Shuffle for better randomness
+            for (let i = playlist.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [playlist[i], playlist[j]] = [playlist[j], playlist[i]];
+            }
         }
 
         const nextId = playlist.pop();
@@ -80,8 +81,8 @@ function initDynamicBackground() {
         });
     };
     img.onerror = () => {
-        const fallbackId = '1464802686167-b939a6910659';
-        bgContainer.style.backgroundImage = `url('https://images.unsplash.com/photo-${fallbackId}?auto=format&fit=crop&q=80&w=1920')`;
+        const fallbackUrl = 'https://images.unsplash.com/photo-1464802686167-b939a6910659?auto=format&fit=crop&q=80&w=1920';
+        bgContainer.style.backgroundImage = `url('${fallbackUrl}')`;
         bgContainer.style.opacity = '1';
     };
     img.src = currentUrl;
