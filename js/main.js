@@ -18,7 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /**
  * Initialize dynamic space background
- * Uses sessionStorage to maintain the same background during a single visit
+ * - Input Page: Always generates a new background on load/refresh.
+ * - Result Page: Maintains the background from the input page.
  */
 function initDynamicBackground() {
     const bgContainer = document.querySelector('.background-image');
@@ -38,13 +39,14 @@ function initDynamicBackground() {
         '1534067783941-51c9c23ecfd3'  // Dark Cosmic Dust
     ];
 
+    const isInputPage = !!document.getElementById("fortuneBtn");
     let imageUrl = sessionStorage.getItem('saju_bg_url');
 
-    if (!imageUrl) {
+    // If on input page, or if no background is set yet, pick a new random one
+    if (isInputPage || !imageUrl) {
         const randomId = spaceImages[Math.floor(Math.random() * spaceImages.length)];
-        // Use a fixed timestamp per session to allow caching while remaining "random" for the user
-        const sessionTs = Math.floor(new Date().getTime() / 10000);
-        imageUrl = `https://images.unsplash.com/photo-${randomId}?auto=format&fit=crop&q=80&w=1920&random=${sessionTs}`;
+        const timestamp = new Date().getTime(); // True randomness for every load
+        imageUrl = `https://images.unsplash.com/photo-${randomId}?auto=format&fit=crop&q=80&w=1920&random=${timestamp}`;
         sessionStorage.setItem('saju_bg_url', imageUrl);
     }
 
@@ -55,7 +57,6 @@ function initDynamicBackground() {
         bgContainer.style.opacity = '1';
     };
     img.onerror = () => {
-        // Fallback to a very safe direct image if Unsplash random fails
         const fallbackUrl = 'https://images.unsplash.com/photo-1464802686167-b939a6910659?auto=format&fit=crop&q=80&w=1920';
         bgContainer.style.backgroundImage = `url('${fallbackUrl}')`;
         bgContainer.style.opacity = '1';
