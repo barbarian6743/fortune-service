@@ -232,3 +232,76 @@ select {
     font-weight: bold;
     margin-top: 4px;
 }
+
+/* Lotto Generator */
+.lotto-section {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.2);
+}
+
+.lotto-title {
+    display: block;
+    color: var(--accent);
+    font-size: 1rem;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.lotto-balls {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.lotto-ball {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    font-size: 0.9rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3), inset 0 -3px 5px rgba(0, 0, 0, 0.2);
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards;
+}
+
+/* Korean Lotto Colors */
+/* 1-10 Yellow, 11-20 Blue, 21-30 Red, 31-40 Black(Grey), 41-45 Green */
+.ball-yellow {
+    background: radial-gradient(circle at 30% 30%, #fbc02d, #f57f17);
+    color: #333;
+    text-shadow: none;
+}
+
+.ball-blue {
+    background: radial-gradient(circle at 30% 30%, #42a5f5, #1565c0);
+}
+
+.ball-red {
+    background: radial-gradient(circle at 30% 30%, #ef5350, #c62828);
+}
+
+.ball-grey {
+    background: radial-gradient(circle at 30% 30%, #bdbdbd, #616161);
+}
+
+.ball-green {
+    background: radial-gradient(circle at 30% 30%, #66bb6a, #2e7d32);
+}
+
+@keyframes popIn {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}

@@ -62,6 +62,39 @@ function calculateFortune(gender, birth) {
     const fortune = fortunes[fortuneIndex];
     const luckyColor = colors[colorIndex];
 
+    // Lotto Number Generation
+    const lottoNumbers = new Set();
+    // Use some randomness mixed with seed, but mostly random for "Lotto" fun
+    // Actually, users prefer "Lucky Numbers" to be somewhat constant for the day?
+    // Let's make it random but seeded by today + birth so it's consistent for the user today.
+    // Simple seeded random function
+    let tempSeed = seed;
+    const seededRandom = () => {
+        const x = Math.sin(tempSeed++) * 10000;
+        return x - Math.floor(x);
+    };
+
+    while (lottoNumbers.size < 6) {
+        // Generate number 1-45
+        const num = Math.floor(seededRandom() * 45) + 1;
+        lottoNumbers.add(num);
+    }
+
+    // Sort numbers
+    const sortedLotto = Array.from(lottoNumbers).sort((a, b) => a - b);
+
+    // Generate HTML for balls
+    const lottoHtml = sortedLotto.map((num, index) => {
+        let colorClass = 'ball-yellow'; // Default 1-10
+        if (num >= 11 && num <= 20) colorClass = 'ball-blue';
+        else if (num >= 21 && num <= 30) colorClass = 'ball-red';
+        else if (num >= 31 && num <= 40) colorClass = 'ball-grey';
+        else if (num >= 41 && num <= 45) colorClass = 'ball-green';
+
+        // Add staggering delay to animation
+        return `<div class="lotto-ball ${colorClass}" style="animation-delay: ${index * 0.1}s">${num}</div>`;
+    }).join('');
+
     resultBox.innerHTML = `
         <span class="result-title">✨ 오늘의 별자리 운세</span>
         <div class="fortune-text">${fortune}</div>
@@ -74,6 +107,13 @@ function calculateFortune(gender, birth) {
             <div class="lucky-item">
                 <span>행운의 색</span>
                 <span class="lucky-value">${luckyColor}</span>
+            </div>
+        </div>
+
+        <div class="lotto-section">
+            <span class="lotto-title">🎰 행운의 로또 번호</span>
+            <div class="lotto-balls">
+                ${lottoHtml}
             </div>
         </div>
     `;
