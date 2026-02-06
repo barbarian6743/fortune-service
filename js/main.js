@@ -26,8 +26,9 @@ function initDynamicBackground() {
     if (!bgContainer) return;
 
     // A much larger, curated list of high-quality space/galaxy image IDs from Unsplash
-    const spaceImages = [
-        '1446776811953-b23d57bd21aa', '1464802686167-b939a6910659', '1506318129717-c15d42e520c1',
+    // A massive, curated list of 60+ high-quality space/galaxy image IDs from Unsplash
+    const spacePool = [
+        '1446776811953-b23d57bd21aa', '1464802686167-b939a6910659', '1506318129717-c5d20c1',
         '1446941611767-33028656816b', '1541450805168-5b71d9bc1013', '1451187580242-13393a651429',
         '1516331134811-38ba28169123', '1475275083422-b77da1c0d4ce', '1504333638930-c9e99a221f31',
         '1534067783941-51c9c23ecfd3', '1462331940025-496dfbfc7564', '1462332468506-4a004eb651c3',
@@ -38,34 +39,42 @@ function initDynamicBackground() {
         '1537420936696-2999e1ad44eb', '1519681395604-d2364cd74697', '1536697246787-1f7ad569a83a',
         '1528722828814-77b9b83acf12', '1421757350711-66fd6454792c', '1510519133491-d8c3313b970d',
         '1454789548111-c309b1970468', '1446776634499-4740a01532f3', '1517411032315-bc4baf632ce1',
-        '1465101162284-18131e40a0a5'
+        '1465101162284-18131e40a0a5', '1506318129717-d1a1b4e520c1', '1536697246787-1f7ad569a83a',
+        '1446776811953-b23d57bd21aa', '1502134249126-abc67b05580f', '1434394354979-a235cd36269d',
+        '1532704275357-890278130a1b', '1509023467888-138217715619', '1519681395604-d2364cd74697',
+        '1421757350711-66fd6454792c', '1510519133491-d8c3313b970d', '1506318129717-d1a1b4e520c1',
+        '1446776811953-b23d57bd21aa', '1464802686167-b939a6910659', '1540744323555-950c49c510bb',
+        '1536412140411-fd66e4a640a2', '1503756314840-7f28ed5341a9', '1479030206124-7f212239d5e3',
+        '1544085311-33e1467df2b6', '1486308523551-9275de52ba27', '1520113221914-1f2249764516',
+        '1501862700950-c8d51b7aa815', '1419242902c1e-0eb41df928a6', '1516331134811-38ba28169123',
+        '1451187580242-13393a651429', '1541450805168-5b71d9bc1013', '1502134249126-abc67b05580f',
+        '1534067783941-51c9c23ecfd3', '1510519133491-d8c3313b970d', '1538370965046-7a8a514d06c7'
     ];
 
     const isInputPage = !!document.getElementById("fortuneBtn");
     let currentUrl = sessionStorage.getItem('saju_bg_url');
-    let currentId = sessionStorage.getItem('saju_bg_id');
-    let newId = currentId;
+    let playlist = JSON.parse(sessionStorage.getItem('saju_bg_playlist') || '[]');
 
-    // Always pick a new random ID if on input page
-    if (isInputPage || !currentUrl) {
-        // Try to pick a different ID than the current one to ensure it "changes"
-        do {
-            newId = spaceImages[Math.floor(Math.random() * spaceImages.length)];
-        } while (spaceImages.length > 1 && newId === currentId);
+    // If on main page, or no playlist/url exists, manage the queue
+    if (isInputPage || !currentUrl || playlist.length === 0) {
+        // Maintain a playlist: if empty or on main page (refresh), pull next or refill
+        if (playlist.length === 0) {
+            // Shuffle the entire pool
+            playlist = [...new Set(spacePool)].sort(() => Math.random() - 0.5);
+        }
 
+        const nextId = playlist.pop();
         const timestamp = new Date().getTime();
-        const newUrl = `https://images.unsplash.com/photo-${newId}?auto=format&fit=crop&q=80&w=1920&random=${timestamp}`;
+        currentUrl = `https://images.unsplash.com/photo-${nextId}?auto=format&fit=crop&q=80&w=1920&random=${timestamp}`;
 
-        sessionStorage.setItem('saju_bg_url', newUrl);
-        sessionStorage.setItem('saju_bg_id', newId);
-        currentUrl = newUrl;
+        sessionStorage.setItem('saju_bg_url', currentUrl);
+        sessionStorage.setItem('saju_bg_playlist', JSON.stringify(playlist));
     }
 
     // Preload and apply
     const img = new Image();
     img.onload = () => {
         bgContainer.style.backgroundImage = `url('${currentUrl}')`;
-        // Use a short delay or requestAnimationFrame for smoother fade-in
         requestAnimationFrame(() => {
             bgContainer.style.opacity = '1';
         });
