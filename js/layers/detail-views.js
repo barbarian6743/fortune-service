@@ -10,75 +10,114 @@ const LayerDetailViews = {
     renderLayer1Detail(birth, time, pillars) {
         const state = window.FortuneState;
         const p = state.getPillars();
+        const traits = window.ELEMENT_TRAITS;
+
+        const renderChar = (charData, isDayMaster = false) => {
+            if (!charData || !charData.element) {
+                return `<div style="background:rgba(255,255,255,0.03); border-radius:12px; padding:15px; text-align:center; color:var(--text-muted);">?</div>`;
+            }
+            const color = traits[charData.element] ? traits[charData.element].color : '#ccc';
+            const polarityStr = charData.polarity === '+' ? '陽' : '陰';
+            const elementName = traits[charData.element] ? traits[charData.element].name.split('(')[0] : '미정';
+
+            return `
+                <div style="
+                    background: rgba(255,255,255,0.03); 
+                    border: 1px solid ${isDayMaster ? 'gold' : 'rgba(255,255,255,0.1)'}; 
+                    border-radius: 12px; 
+                    padding: 15px 5px; 
+                    text-align: center;
+                    position: relative;
+                    ${isDayMaster ? 'box-shadow: 0 0 15px rgba(255,215,0,0.2);' : ''}
+                ">
+                    <div style="color:${color}; font-size: 1.8rem; font-weight: bold; margin-bottom: 5px;">${charData.hanja || '?'}</div>
+                    <div style="font-size: 0.85rem; color: #ccc;">${charData.ko || ''}</div>
+                    <div style="font-size: 0.7rem; color: ${color}; margin-top: 5px; opacity: 0.8;">
+                        ${elementName} (${polarityStr})
+                    </div>
+                    ${isDayMaster ? '<div style="position:absolute; top:-10px; right:-5px; background:gold; color:black; font-size:0.6rem; padding:2px 5px; border-radius:4px; font-weight:bold;">ME</div>' : ''}
+                </div>
+            `;
+        };
 
         return `
             <div class="detail-view">
                 <h2 style="color:var(--accent); margin-bottom:20px;">📅 제1장. 천문 역법 (상세)</h2>
                 
                 <div class="interpretation-card">
-                    <h3>🌍 입력 정보</h3>
-                    <p><strong>양력 생년월일:</strong> ${birth}</p>
-                    <p><strong>태어난 시간:</strong> ${time}</p>
-                    <p style="color:var(--text-muted); font-size:0.9rem; margin-top:10px;">
-                        ※ 사주는 양력을 기준으로 계산되며, 월(月)은 절기(節氣)를 기준으로 바뀝니다.
+                    <h3>🌍 입력 정보 및 계산 기준</h3>
+                    <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+                        <p style="margin:0;"><strong>기준 생년월일:</strong> ${birth} (${time})</p>
+                        <span class="badge" style="background:rgba(255,255,255,0.1); font-size:0.8rem;">태양 황도 좌표 기준</span>
+                    </div>
+                    <p style="color:var(--text-muted); font-size:0.85rem; margin-top:12px; line-height:1.6;">
+                        사주(四柱)는 태어난 연, 월, 일, 시의 4가지 기둥을 의미합니다. 
+                        특히 <strong>월(月)</strong>은 단순히 달력이 아닌 24절기(지구와 태양의 각도)를 기준으로 산출되는 가장 정밀한 천문 시계입니다.
                     </p>
                 </div>
 
                 <div class="interpretation-card">
-                    <h3>🔢 60갑자 좌표</h3>
-                    <p>사주팔자는 태어난 시간을 60갑자(甲子)라는 천문 좌표계로 변환한 것입니다.</p>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <h3 style="margin:0;">🔢 사주팔자 (四柱八字) 좌표계</h3>
+                        <span style="font-size:0.8rem; color:var(--text-muted);">* 오른쪽에서 왼쪽 순 (년→월→일→시)</span>
+                    </div>
                     
-                    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:15px; margin-top:20px;">
-                        <div style="text-align:center; background:rgba(255,255,255,0.05); padding:15px; border-radius:8px;">
-                            <div style="color:var(--text-muted); font-size:0.8rem; margin-bottom:5px;">시주 (時柱)</div>
-                            <div style="font-size:1.5rem; font-weight:bold; color:${window.ELEMENT_TRAITS[p.hour.data.element].color};">
-                                ${p.hour.data.hanja}${p.hour.branchData.hanja}
-                            </div>
-                            <div style="color:var(--text-muted); font-size:0.8rem; margin-top:5px;">
-                                ${p.hour.data.hangul}${p.hour.branchData.hangul}
-                            </div>
+                    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px;">
+                        <!-- Labels -->
+                        <div style="text-align:center; color:var(--text-muted); font-size:0.75rem;">시주 (Time)</div>
+                        <div style="text-align:center; color:var(--accent); font-size:0.75rem; font-weight:bold;">일주 (Day)</div>
+                        <div style="text-align:center; color:var(--text-muted); font-size:0.75rem;">월주 (Month)</div>
+                        <div style="text-align:center; color:var(--text-muted); font-size:0.75rem;">년주 (Year)</div>
+
+                        <!-- Heavenly Stems (Top row) -->
+                        ${renderChar(p.hour.data)}
+                        ${renderChar(p.day.data, true)}
+                        ${renderChar(p.month.data)}
+                        ${renderChar(p.year.data)}
+
+                        <!-- Earthly Branches (Bottom row) -->
+                        ${renderChar(p.hour.branchData)}
+                        ${renderChar(p.day.branchData)}
+                        ${renderChar(p.month.branchData)}
+                        ${renderChar(p.year.branchData)}
+
+                        <!-- Stem/Branch Labels side -->
+                        <div style="grid-column: 1 / 5; display: flex; justify-content: space-between; margin-top: 5px; padding: 0 5px;">
+                            <span style="font-size:0.7rem; color:var(--text-muted);">▲ 천간 (정신/생각)</span>
+                            <span style="font-size:0.7rem; color:var(--text-muted);">▼ 지지 (현실/환경)</span>
                         </div>
-                        
-                        <div style="text-align:center; background:rgba(255,215,0,0.1); padding:15px; border-radius:8px; border:2px solid gold;">
-                            <div style="color:var(--accent); font-size:0.8rem; margin-bottom:5px;">일주 (日柱) ★</div>
-                            <div style="font-size:1.5rem; font-weight:bold; color:${window.ELEMENT_TRAITS[p.day.data.element].color};">
-                                ${p.day.data.hanja}${p.day.branchData.hanja}
-                            </div>
-                            <div style="color:var(--accent); font-size:0.8rem; margin-top:5px;">
-                                ${p.day.data.hangul}${p.day.branchData.hangul}
-                            </div>
-                        </div>
-                        
-                        <div style="text-align:center; background:rgba(255,255,255,0.05); padding:15px; border-radius:8px;">
-                            <div style="color:var(--text-muted); font-size:0.8rem; margin-bottom:5px;">월주 (月柱)</div>
-                            <div style="font-size:1.5rem; font-weight:bold; color:${window.ELEMENT_TRAITS[p.month.data.element].color};">
-                                ${p.month.data.hanja}${p.month.branchData.hanja}
-                            </div>
-                            <div style="color:var(--text-muted); font-size:0.8rem; margin-top:5px;">
-                                ${p.month.data.hangul}${p.month.branchData.hangul}
-                            </div>
-                        </div>
-                        
-                        <div style="text-align:center; background:rgba(255,255,255,0.05); padding:15px; border-radius:8px;">
-                            <div style="color:var(--text-muted); font-size:0.8rem; margin-bottom:5px;">년주 (年柱)</div>
-                            <div style="font-size:1.5rem; font-weight:bold; color:${window.ELEMENT_TRAITS[p.year.data.element].color};">
-                                ${p.year.data.hanja}${p.year.branchData.hanja}
-                            </div>
-                            <div style="color:var(--text-muted); font-size:0.8rem; margin-top:5px;">
-                                ${p.year.data.hangul}${p.year.branchData.hangul}
-                            </div>
-                        </div>
+                    </div>
+
+                    <div style="margin-top:20px; padding:15px; background:rgba(0,0,0,0.2); border-radius:10px; font-size:0.9rem; line-height:1.7;">
+                        <p style="margin-top:0;"><strong>💡 좌표 읽는 법:</strong></p>
+                        <ul style="padding-left:18px; margin-bottom:0; color:#ccc;">
+                            <li>위쪽의 4글자(천간)는 당신의 <strong>드러나는 성격과 생각</strong>을 나타냅니다.</li>
+                            <li>아래쪽의 4글자(지지)는 당신을 둘러싼 <strong>실제 환경과 신체적 기운</strong>입니다.</li>
+                            <li>황색 박스(<span style="color:gold; font-weight:bold;">ME</span>)로 표시된 <strong>일간</strong>이 바로 '사주의 주인공'인 당신 자신입니다.</li>
+                        </ul>
                     </div>
                 </div>
 
                 <div class="interpretation-card">
-                    <h3>📖 사주 구조 설명</h3>
-                    <ul style="line-height:1.8; color:#ddd;">
-                        <li><strong>년주(年柱):</strong> 조상과 가문의 기운, 유년기(0~15세)</li>
-                        <li><strong>월주(月柱):</strong> 부모와 사회 활동, 청년기(16~30세)</li>
-                        <li><strong>일주(日柱):</strong> 자기 자신과 배우자, 중년기(31~45세) - 가장 중요!</li>
-                        <li><strong>시주(時柱):</strong> 자녀와 말년, 노년기(46세~)</li>
-                    </ul>
+                    <h3>📖 각 기둥(柱)의 생애 주기와 의미</h3>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                        <div style="background:rgba(255,255,255,0.03); padding:12px; border-radius:8px;">
+                            <h4 style="margin:0 0 5px 0; font-size:0.9rem; color:var(--accent);">년주 (年柱): 뿌리</h4>
+                            <p style="margin:0; font-size:0.8rem; color:#aaa;">조상, 부모님의 배경, 유년기(0~15세)의 기운을 담고 있습니다.</p>
+                        </div>
+                        <div style="background:rgba(255,255,255,0.03); padding:12px; border-radius:8px;">
+                            <h4 style="margin:0 0 5px 0; font-size:0.9rem; color:var(--accent);">월주 (月柱): 기둥</h4>
+                            <p style="margin:0; font-size:0.8rem; color:#aaa;">사회적 성공, 직업운, 청년기(16~30세)의 가장 활동적인 환경입니다.</p>
+                        </div>
+                        <div style="background:rgba(255,255,255,0.03); padding:12px; border-radius:8px; border-left:2px solid gold;">
+                            <h4 style="margin:0 0 5px 0; font-size:0.9rem; color:gold;">일주 (日柱): 나</h4>
+                            <p style="margin:0; font-size:0.8rem; color:#aaa;">자아 정체성, 배우자와의 관계, 중년기(31~45세)의 핵심입니다.</p>
+                        </div>
+                        <div style="background:rgba(255,255,255,0.03); padding:12px; border-radius:8px;">
+                            <h4 style="margin:0 0 5px 0; font-size:0.9rem; color:var(--accent);">시주 (時柱): 열매</h4>
+                            <p style="margin:0; font-size:0.8rem; color:#aaa;">말년운, 자녀복, 결과물, 노년기(46세 이후)의 가치를 의미합니다.</p>
+                        </div>
+                    </div>
                 </div>
 
                 ${this.getBackButton()}

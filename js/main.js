@@ -8,12 +8,60 @@
 // ========================================
 
 document.addEventListener('DOMContentLoaded', () => {
+    initDynamicBackground();
     if (document.getElementById("fortuneBtn")) {
         initInputPage();
     } else if (document.getElementById("result")) {
         initResultPage();
     }
 });
+
+/**
+ * Initialize dynamic space background
+ * Uses sessionStorage to maintain the same background during a single visit
+ */
+function initDynamicBackground() {
+    const bgContainer = document.querySelector('.background-image');
+    if (!bgContainer) return;
+
+    // A curated list of high-quality space/galaxy image IDs from Unsplash
+    const spaceImages = [
+        '1446776811953-b23d57bd21aa', // Earth/Space
+        '1464802686167-b939a6910659', // Night Sky/Galaxy
+        '1506318129717-c15d42e520c1', // Colorful Stars
+        '1446941611767-33028656816b', // Deep Space Nebula
+        '1541450805168-5b71d9bc1013', // Spiral Galaxy
+        '1451187580242-13393a651429', // Galactic Center
+        '1516331134811-38ba28169123', // Blue Space Cloud
+        '1475275083422-b77da1c0d4ce', // Vibrant Stars
+        '1504333638930-c9e99a221f31', // Atmospheric Starry Night
+        '1534067783941-51c9c23ecfd3'  // Dark Cosmic Dust
+    ];
+
+    let imageUrl = sessionStorage.getItem('saju_bg_url');
+
+    if (!imageUrl) {
+        const randomId = spaceImages[Math.floor(Math.random() * spaceImages.length)];
+        // Use a fixed timestamp per session to allow caching while remaining "random" for the user
+        const sessionTs = Math.floor(new Date().getTime() / 10000);
+        imageUrl = `https://images.unsplash.com/photo-${randomId}?auto=format&fit=crop&q=80&w=1920&random=${sessionTs}`;
+        sessionStorage.setItem('saju_bg_url', imageUrl);
+    }
+
+    // Preload image to avoid white flash or sudden jump
+    const img = new Image();
+    img.onload = () => {
+        bgContainer.style.backgroundImage = `url('${imageUrl}')`;
+        bgContainer.style.opacity = '1';
+    };
+    img.onerror = () => {
+        // Fallback to a very safe direct image if Unsplash random fails
+        const fallbackUrl = 'https://images.unsplash.com/photo-1464802686167-b939a6910659?auto=format&fit=crop&q=80&w=1920';
+        bgContainer.style.backgroundImage = `url('${fallbackUrl}')`;
+        bgContainer.style.opacity = '1';
+    };
+    img.src = imageUrl;
+}
 
 // ========================================
 // Input Page Logic
@@ -37,11 +85,14 @@ function initInputPage() {
     const calendarTypeInput = document.getElementById("calendarType");
     const calendarHint = document.getElementById("calendarHint");
 
+    const leapMonthContainer = document.getElementById("leapMonthContainer");
+
     solarBtn.addEventListener("click", () => {
         calendarTypeInput.value = "solar";
         solarBtn.classList.add("active");
         lunarBtn.classList.remove("active");
         calendarHint.innerHTML = "☀️ 양력으로 입력해주세요";
+        leapMonthContainer.style.display = "none";
     });
 
     lunarBtn.addEventListener("click", () => {
@@ -49,6 +100,7 @@ function initInputPage() {
         lunarBtn.classList.add("active");
         solarBtn.classList.remove("active");
         calendarHint.innerHTML = "🌙 음력으로 입력해주세요 (양력으로 자동 변환됩니다)";
+        leapMonthContainer.style.display = "block";
     });
 
     // Dynamic day population based on month/year
@@ -93,10 +145,24 @@ function initInputPage() {
         let finalDay = day;
 
         if (calendarType === "lunar") {
-            // TODO: Implement proper lunar-to-solar conversion
-            // For now, just show a message
-            alert("⚠️ 음력 변환 기능은 곧 추가될 예정입니다.\n현재는 양력으로만 입력 가능합니다.");
-            return;
+            const isLeap = document.getElementById("isLeap").checked;
+            try {
+                const solarDate = window.LunarCalendar.toSolar(
+                    parseInt(year),
+                    parseInt(month),
+                    parseInt(day),
+                    isLeap
+                );
+
+                finalYear = solarDate.getFullYear().toString();
+                finalMonth = (solarDate.getMonth() + 1).toString();
+                finalDay = solarDate.getDate().toString();
+
+                console.log(`Lunar (${year}-${month}-${day}${isLeap ? ' Leap' : ''}) -> Solar (${finalYear}-${finalMonth}-${finalDay})`);
+            } catch (e) {
+                alert("⚠️ 유효하지 않은 음력 날짜입니다.");
+                return;
+            }
         }
 
         // Construct date and time strings
@@ -273,29 +339,31 @@ function renderSummaryView(container, data) {
 function renderLayer1(birth, time, pillars) {
     const p = pillars;
     return `
-        <div class="layer" onclick="showDetailView('layer1')" style="cursor:pointer; border-left: 4px solid var(--accent);">
+        <div class="layer" onclick="showDetailView('layer1')" style="cursor:pointer; border-left: 4px solid var(--accent); overflow:hidden;">
             <h2 style="color:var(--accent);">🔭 제1장. 천문 역법</h2>
             <p class="academic-note">태어난 순간의 천문 좌표를 60갑자 기하학으로 변환한 데이터입니다.</p>
-            <div class="saju-grid">
-                <div class="pillar">
-                    <div class="pillar-label">시주 (時柱)</div>
-                    <div class="pillar-value">${p.hour.data.hanja}${p.hour.branchData.hanja}</div>
-                    <div class="pillar-hangul">${p.hour.data.hangul}${p.hour.branchData.hangul}</div>
-                </div>
-                <div class="pillar highlight">
-                    <div class="pillar-label">일주 (日柱) ★</div>
-                    <div class="pillar-value">${p.day.data.hanja}${p.day.branchData.hanja}</div>
-                    <div class="pillar-hangul">${p.day.data.hangul}${p.day.branchData.hangul}</div>
-                </div>
-                <div class="pillar">
-                    <div class="pillar-label">월주 (月柱)</div>
-                    <div class="pillar-value">${p.month.data.hanja}${p.month.branchData.hanja}</div>
-                    <div class="pillar-hangul">${p.month.data.hangul}${p.month.branchData.hangul}</div>
-                </div>
-                <div class="pillar">
-                    <div class="pillar-label">년주 (年柱)</div>
-                    <div class="pillar-value">${p.year.data.hanja}${p.year.branchData.hanja}</div>
-                    <div class="pillar-hangul">${p.year.data.hangul}${p.year.branchData.hangul}</div>
+            <div style="width:100%; overflow-x:auto;">
+                <div class="saju-grid">
+                    <div class="pillar">
+                        <div class="pillar-label">시주 (時柱)</div>
+                        <div class="pillar-value">${p.hour.data.hanja}${p.hour.branchData.hanja}</div>
+                        <div class="pillar-hangul">${p.hour.data.ko}${p.hour.branchData.ko}</div>
+                    </div>
+                    <div class="pillar highlight">
+                        <div class="pillar-label">일주 (日柱) ★</div>
+                        <div class="pillar-value">${p.day.data.hanja}${p.day.branchData.hanja}</div>
+                        <div class="pillar-hangul">${p.day.data.ko}${p.day.branchData.ko}</div>
+                    </div>
+                    <div class="pillar">
+                        <div class="pillar-label">월주 (月柱)</div>
+                        <div class="pillar-value">${p.month.data.hanja}${p.month.branchData.hanja}</div>
+                        <div class="pillar-hangul">${p.month.data.ko}${p.month.branchData.ko}</div>
+                    </div>
+                    <div class="pillar">
+                        <div class="pillar-label">년주 (年柱)</div>
+                        <div class="pillar-value">${p.year.data.hanja}${p.year.branchData.hanja}</div>
+                        <div class="pillar-hangul">${p.year.data.ko}${p.year.branchData.ko}</div>
+                    </div>
                 </div>
             </div>
             <p style="margin-top:10px; font-size:0.85rem; color:#aaa;">📍 양력: ${birth} | 시간: ${time}</p>
