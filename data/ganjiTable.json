@@ -1,0 +1,184 @@
+{
+    "stems": [
+        {
+            "key": "Gap",
+            "ko": "갑",
+            "hanja": "甲",
+            "element": "wood",
+            "polarity": "+"
+        },
+        {
+            "key": "Eul",
+            "ko": "을",
+            "hanja": "乙",
+            "element": "wood",
+            "polarity": "-"
+        },
+        {
+            "key": "Byung",
+            "ko": "병",
+            "hanja": "丙",
+            "element": "fire",
+            "polarity": "+"
+        },
+        {
+            "key": "Jung",
+            "ko": "정",
+            "hanja": "丁",
+            "element": "fire",
+            "polarity": "-"
+        },
+        {
+            "key": "Mu",
+            "ko": "무",
+            "hanja": "戊",
+            "element": "earth",
+            "polarity": "+"
+        },
+        {
+            "key": "Gi",
+            "ko": "기",
+            "hanja": "己",
+            "element": "earth",
+            "polarity": "-"
+        },
+        {
+            "key": "Gyeong",
+            "ko": "경",
+            "hanja": "庚",
+            "element": "metal",
+            "polarity": "+"
+        },
+        {
+            "key": "Shin",
+            "ko": "신",
+            "hanja": "辛",
+            "element": "metal",
+            "polarity": "-"
+        },
+        {
+            "key": "Im",
+            "ko": "임",
+            "hanja": "壬",
+            "element": "water",
+            "polarity": "+"
+        },
+        {
+            "key": "Gye",
+            "ko": "계",
+            "hanja": "癸",
+            "element": "water",
+            "polarity": "-"
+        }
+    ],
+    "branches": [
+        {
+            "key": "Ja",
+            "ko": "자",
+            "hanja": "子",
+            "element": "water",
+            "polarity": "+",
+            "zodiac": "Rat",
+            "month": 11
+        },
+        {
+            "key": "Chuk",
+            "ko": "축",
+            "hanja": "丑",
+            "element": "earth",
+            "polarity": "-",
+            "zodiac": "Ox",
+            "month": 12
+        },
+        {
+            "key": "In",
+            "ko": "인",
+            "hanja": "寅",
+            "element": "wood",
+            "polarity": "+",
+            "zodiac": "Tiger",
+            "month": 1
+        },
+        {
+            "key": "Myo",
+            "ko": "묘",
+            "hanja": "卯",
+            "element": "wood",
+            "polarity": "-",
+            "zodiac": "Rabbit",
+            "month": 2
+        },
+        {
+            "key": "Jin",
+            "ko": "진",
+            "hanja": "辰",
+            "element": "earth",
+            "polarity": "+",
+            "zodiac": "Dragon",
+            "month": 3
+        },
+        {
+            "key": "Sa",
+            "ko": "사",
+            "hanja": "巳",
+            "element": "fire",
+            "polarity": "-",
+            "zodiac": "Snake",
+            "month": 4
+        },
+        {
+            "key": "O",
+            "ko": "오",
+            "hanja": "午",
+            "element": "fire",
+            "polarity": "+",
+            "zodiac": "Horse",
+            "month": 5
+        },
+        {
+            "key": "Mi",
+            "ko": "미",
+            "hanja": "未",
+            "element": "earth",
+            "polarity": "-",
+            "zodiac": "Sheep",
+            "month": 6
+        },
+        {
+            "key": "Shin",
+            "ko": "신",
+            "hanja": "申",
+            "element": "metal",
+            "polarity": "+",
+            "zodiac": "Monkey",
+            "month": 7
+        },
+        {
+            "key": "Yu",
+            "ko": "유",
+            "hanja": "酉",
+            "element": "metal",
+            "polarity": "-",
+            "zodiac": "Rooster",
+            "month": 8
+        },
+        {
+            "key": "Sul",
+            "ko": "술",
+            "hanja": "戌",
+            "element": "earth",
+            "polarity": "+",
+            "zodiac": "Dog",
+            "month": 9
+        },
+        {
+            "key": "Hae",
+            "ko": "해",
+            "hanja": "亥",
+            "element": "water",
+            "polarity": "-",
+            "zodiac": "Pig",
+            "month": 10
+        }
+    ]
+}

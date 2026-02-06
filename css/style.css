@@ -4,7 +4,6 @@
     --text-main: #ffffff;
     --text-muted: #d1c4e9;
     --accent: #ffd700;
-    /* Gold */
     --accent-glow: rgba(255, 215, 0, 0.5);
     --btn-gradient: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
 }
@@ -16,7 +15,6 @@
 body {
     margin: 0;
     font-family: 'Noto Serif KR', serif;
-    background: var(--primary-bg);
     background: linear-gradient(to bottom, #1a1a2e, #16213e, #2d1b4e);
     color: var(--text-main);
     min-height: 100vh;
@@ -26,46 +24,40 @@ body {
     overflow-x: hidden;
 }
 
-/* Starry Background Effect */
 .background-stars {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-image:
-        radial-gradient(white, rgba(255, 255, 255, .2) 2px, transparent 3px),
-        radial-gradient(white, rgba(255, 255, 255, .15) 1px, transparent 2px),
-        radial-gradient(white, rgba(255, 255, 255, .1) 2px, transparent 3px);
-    background-size: 550px 550px, 350px 350px, 250px 250px;
-    background-position: 0 0, 40px 60px, 130px 270px;
+    background-image: radial-gradient(white, rgba(255, 255, 255, .2) 2px, transparent 3px);
+    background-size: 550px 550px;
     z-index: -1;
     animation: twinkle 60s linear infinite;
 }
 
 @keyframes twinkle {
     from {
-        background-position: 0 0, 40px 60px, 130px 270px;
+        background-position: 0 0;
     }
 
     to {
-        background-position: 550px 550px, 390px 410px, 380px 520px;
+        background-position: 550px 550px;
     }
 }
 
 .container {
     background: var(--card-bg);
     backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 2.5rem;
-    width: 90%;
-    max-width: 400px;
+    padding: 2rem;
+    width: 95%;
+    max-width: 650px;
+    /* Enhanced width for detailed content */
     border-radius: 20px;
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
     text-align: center;
-    position: relative;
-    overflow: hidden;
+    margin: 20px;
 }
 
 h1 {
@@ -82,45 +74,21 @@ h1 {
     font-weight: 300;
 }
 
-.input-group {
-    margin-bottom: 20px;
-    text-align: left;
-}
-
-label {
-    display: block;
-    margin-bottom: 8px;
-    color: var(--text-muted);
-    font-size: 0.9rem;
-}
-
-select,
-input {
+input,
+select {
     width: 100%;
     padding: 12px;
+    margin-bottom: 15px;
     background: rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 8px;
     color: white;
-    font-family: inherit;
-    font-size: 1rem;
     outline: none;
-    transition: all 0.3s ease;
 }
 
-select:focus,
-input:focus {
+input:focus,
+select:focus {
     border-color: var(--accent);
-    box-shadow: 0 0 8px var(--accent-glow);
-}
-
-/* Custom Select Arrow Fix for some browsers */
-select {
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 20px;
 }
 
 .magic-btn {
@@ -133,56 +101,128 @@ select {
     border: none;
     border-radius: 50px;
     cursor: pointer;
-    margin-top: 10px;
-    transition: transform 0.2s, box-shadow 0.2s;
-    position: relative;
-    overflow: hidden;
-    font-family: 'Noto Serif KR', serif;
+    transition: transform 0.2s;
 }
 
 .magic-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(106, 17, 203, 0.4);
 }
 
-.magic-btn:active {
-    transform: translateY(0);
+/* --- New Academic Layer Styles --- */
+.layer-section {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    margin-bottom: 25px;
+    border-radius: 0 12px 12px 0;
+    /* Left border provided inline */
+    text-align: left;
+    transition: transform 0.3s ease;
 }
 
-/* Loading Spinner */
+.layer-section:hover {
+    transform: translateX(5px);
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.layer-title {
+    margin: 0 0 10px 0;
+    font-size: 1.1rem;
+    color: white;
+    font-weight: bold;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 8px;
+}
+
+.academic-note {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 15px;
+    font-style: italic;
+}
+
+.insight-box {
+    background: rgba(255, 215, 0, 0.1);
+    border-left: 3px solid gold;
+    padding: 10px;
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #ffd700;
+}
+
+.interpretation-card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.interpretation-card h4 {
+    margin: 0 0 8px 0;
+    color: var(--accent);
+    font-size: 1rem;
+}
+
+.interpretation-card p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #eee;
+}
+
+/* Grid & Ganji Styles (Inherited & Refined) */
+.ganji-box {
+    width: 45px;
+    height: 45px;
+    line-height: 45px;
+    border-radius: 50%;
+    color: white;
+    font-weight: bold;
+    margin: 0 auto;
+    font-size: 1.2rem;
+}
+
+.ten-god-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin: 5px 0;
+}
+
 .hidden {
     display: none !important;
 }
 
-#loading {
-    margin-top: 20px;
-    color: var(--text-muted);
+/* --- Detail View Styles --- */
+.clickable-header {
+    cursor: pointer;
+    position: relative;
+    padding-right: 30px;
 }
 
-.spinner {
-    width: 40px;
-    height: 40px;
-    margin: 0 auto 10px;
-    border: 4px solid rgba(255, 255, 255, 0.1);
-    border-left-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
+.clickable-header::after {
+    content: '🔍';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    opacity: 0.7;
+    transition: opacity 0.3s;
 }
 
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
+.clickable-header:hover::after {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.2);
 }
 
-/* Result Card */
-.result-card {
-    margin-top: 25px;
-    padding: 20px;
-    background: rgba(0, 0, 0, 0.4);
-    border-radius: 12px;
-    border: 1px solid var(--accent);
-    animation: fadeIn 0.8s ease-out;
+.clickable-header:hover .layer-title {
+    color: var(--accent);
+    text-shadow: 0 0 5px var(--accent-glow);
+}
+
+.detail-view {
+    text-align: left;
+    animation: fadeIn 0.5s ease-out;
 }
 
 @keyframes fadeIn {
@@ -197,111 +237,156 @@ select {
     }
 }
 
-.result-title {
-    color: var(--accent);
-    font-size: 1.2rem;
-    margin-bottom: 10px;
-    display: block;
-    font-weight: bold;
+/* Redesigned Back Button */
+.back-btn {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-muted);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 10px 25px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(5px);
 }
 
-.fortune-text {
-    font-size: 1.05rem;
-    line-height: 1.6;
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--accent);
+    border-color: var(--accent);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.back-btn:active {
+    transform: translateY(-1px);
+}
+
+.detail-content {
+    line-height: 1.8;
+    color: #eee;
+}
+
+.detail-section {
+    margin-bottom: 30px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    border-radius: 12px;
+}
+
+.detail-title {
+    font-size: 1.3rem;
+    color: var(--accent);
+    margin-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+    padding-bottom: 8px;
+}
+
+/* --- Input Page Toggles --- */
+.calendar-toggle-group {
+    display: flex;
+    gap: 10px;
     margin-bottom: 20px;
 }
 
-.lucky-items {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding-top: 15px;
-    font-size: 0.9rem;
+.calendar-toggle {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid rgba(255, 215, 0, 0.3);
+    background: transparent;
+    color: var(--text-muted);
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.lucky-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.calendar-toggle.active {
+    background: var(--accent);
+    color: #2d1b4e;
+    border-color: var(--accent);
+    box-shadow: 0 0 15px var(--accent-glow);
+}
+
+.date-select-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 10px;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(255, 255, 255, 0.1);
+    border-top: 5px solid var(--accent);
+    border-radius: 50%;
+    margin: 20px auto;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* --- Saju Grid --- */
+.saju-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.pillar {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    transition: background 0.3s;
+}
+
+.pillar.highlight {
+    background: rgba(255, 215, 0, 0.1);
+    border: 1px solid var(--accent);
+}
+
+.pillar-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+}
+
+.pillar-value {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: var(--text-main);
+}
+
+.pillar-hangul {
+    font-size: 0.85rem;
     color: var(--text-muted);
 }
 
-.lucky-value {
-    color: white;
-    font-weight: bold;
-    margin-top: 4px;
+/* --- Layer Sections --- */
+.layer {
+    background: var(--card-bg);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: transform 0.3s, background 0.3s;
 }
 
-/* Lotto Generator */
-.lotto-section {
-    margin-top: 20px;
-    padding-top: 15px;
-    border-top: 1px dashed rgba(255, 255, 255, 0.2);
-}
-
-.lotto-title {
-    display: block;
-    color: var(--accent);
-    font-size: 1rem;
-    margin-bottom: 10px;
-    font-weight: bold;
-}
-
-.lotto-balls {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-.lotto-ball {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    color: white;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-    font-size: 0.9rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3), inset 0 -3px 5px rgba(0, 0, 0, 0.2);
-    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards;
-}
-
-/* Korean Lotto Colors */
-/* 1-10 Yellow, 11-20 Blue, 21-30 Red, 31-40 Black(Grey), 41-45 Green */
-.ball-yellow {
-    background: radial-gradient(circle at 30% 30%, #fbc02d, #f57f17);
-    color: #333;
-    text-shadow: none;
-}
-
-.ball-blue {
-    background: radial-gradient(circle at 30% 30%, #42a5f5, #1565c0);
-}
-
-.ball-red {
-    background: radial-gradient(circle at 30% 30%, #ef5350, #c62828);
-}
-
-.ball-grey {
-    background: radial-gradient(circle at 30% 30%, #bdbdbd, #616161);
-}
-
-.ball-green {
-    background: radial-gradient(circle at 30% 30%, #66bb6a, #2e7d32);
-}
-
-@keyframes popIn {
-    from {
-        transform: scale(0);
-        opacity: 0;
-    }
-
-    to {
-        transform: scale(1);
-        opacity: 1;
-    }
+.layer:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.15);
 }
