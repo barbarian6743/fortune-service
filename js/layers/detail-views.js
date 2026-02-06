@@ -177,8 +177,56 @@ const LayerDetailViews = {
                 </div>
 
                 <div class="interpretation-card">
-                    <h3>📊 전체 십신 구조</h3>
-                    <table style="width:100%; border-collapse:collapse; margin-top:10px;">
+                    <h3>📊 전체 십신 구조 및 인생 시기별 해석</h3>
+                    
+                    <div class="detail-section">
+                        <h4 style="color:var(--accent);">1. 초년운 (뿌리/가문) - 년주</h4>
+                        <p><strong>${pillars.year.data.hanja}${pillars.year.branchData.hanja} (${getFriendlyTerm(rawTenGods.yearStem).title})</strong></p>
+                        <p>당신의 어린 시절 환경과 가문의 분위기를 의미합니다. 초년에 형성된 가치관이나 유산이 현재의 당신에게 <strong>${getFriendlyTerm(rawTenGods.yearStem).desc}</strong>(으)로 영향을 미치고 있습니다.</p>
+                    </div>
+
+                    <div class="detail-section">
+                        <h4 style="color:var(--accent);">2. 청년/사회운 (직업/환경) - 월주</h4>
+                        <p><strong>${pillars.month.data.hanja}${pillars.month.branchData.hanja} (${getFriendlyTerm(rawTenGods.monthBranch).title})</strong></p>
+                        <p>가장 활발하게 활동하는 시기의 사회적 환경입니다. 당신은 사회에서 <strong>${window.NarrativeGenerator.getSocialNarrative(rawTenGods.monthBranch, window.EMBEDDED_DATA.narratives)}</strong> 스타일로 성공을 추구해야 합니다.</p>
+                    </div>
+
+                    <div class="detail-view">
+                <h2 class="detail-title">🌍 제4장. 현실 연결 심층 통계</h2>
+                <div class="detail-content">
+                    <div class="detail-section">
+                        <h3>1. 성격 5요인 (Big 5) 추정</h3>
+                        <p>사주 구조로 본 현대 심리학적 특성입니다.</p>
+                        <ul style="list-style:none; padding:0;">
+                            <li style="margin-bottom:8px;">🧠 <strong>개방성:</strong> ${ohaengAnalysis.counts.Fire + ohaengAnalysis.counts.Wood > 2 ? '매우 높음 (창의적, 모험적)' : '보통 (실용적)'}</li>
+                            <li style="margin-bottom:8px;">📋 <strong>성실성:</strong> ${ohaengAnalysis.counts.Metal + ohaengAnalysis.counts.Earth > 2 ? '매우 높음 (계획적, 꼼꼼함)' : '유동적 (즉흥적)'}</li>
+                            <li style="margin-bottom:8px;">🗣️ <strong>외향성:</strong> ${ohaengAnalysis.polarities.Yang > ohaengAnalysis.polarities.Yin ? '높음 (사교적)' : '낮음 (신중함)'}</li>
+                            <li style="margin-bottom:8px;">🤝 <strong>친화성:</strong> ${ohaengAnalysis.counts.Earth + ohaengAnalysis.counts.Water > 2 ? '높음 (이타적, 협력적)' : '독립적 (자기중심적)'}</li>
+                        </ul>
+                    </div>
+
+                    <div class="detail-section">
+                        <h3>2. 직업 적성 가이드</h3>
+                        <p>당신의 타고난 강점과 사회적 환경을 결합한 추천입니다.</p>
+                        <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:12px; margin-top:10px;">
+                            ${window.NarrativeGenerator.getCareerAdvice(pillars.day.data.element, rawTenGods.monthBranch)}
+                        </div>
+                    </div>
+                </div>
+            </div>
+                    <div class="detail-section">
+                        <h4 style="color:var(--accent);">3. 중년/본원 (자아/배우자) - 일주</h4>
+                        <p><strong>${pillars.day.data.hanja}${pillars.day.branchData.hanja} (${getFriendlyTerm(rawTenGods.dayBranch).title})</strong></p>
+                        <p>당신의 핵심 자아와 배우자 자리를 의미합니다. 개인적인 공간에서는 <strong>${getFriendlyTerm(rawTenGods.dayBranch).desc}</strong> 성향을 추구하며 마음의 안정을 찾습니다.</p>
+                    </div>
+
+                    <div class="detail-section">
+                        <h4 style="color:var(--accent);">4. 말년/미래운 (자녀/결실) - 시주</h4>
+                        <p><strong>${pillars.hour.data.hanja}${pillars.hour.branchData.hanja} (${getFriendlyTerm(rawTenGods.hourStem).title})</strong></p>
+                        <p>인생의 최종 지향점입니다. 나이가 들수록 <strong>${getFriendlyTerm(rawTenGods.hourStem).desc}</strong>의 가치를 실현하고자 하며, 자녀와의 관계에서도 이러한 특성이 나타납니다.</p>
+                    </div>
+
+                    <table style="width:100%; border-collapse:collapse; margin-top:20px;">
                         <thead>
                             <tr style="background:rgba(255,255,255,0.1);">
                                 <th style="padding:10px; text-align:left;">위치</th>
