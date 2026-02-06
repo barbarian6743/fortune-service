@@ -25,43 +25,50 @@ function initDynamicBackground() {
     const bgContainer = document.querySelector('.background-image');
     if (!bgContainer) return;
 
-    // A curated list of high-quality space/galaxy image IDs from Unsplash
+    // A larger, curated list of high-quality space/galaxy image IDs from Unsplash
     const spaceImages = [
-        '1446776811953-b23d57bd21aa', // Earth/Space
-        '1464802686167-b939a6910659', // Night Sky/Galaxy
-        '1506318129717-c15d42e520c1', // Colorful Stars
-        '1446941611767-33028656816b', // Deep Space Nebula
-        '1541450805168-5b71d9bc1013', // Spiral Galaxy
-        '1451187580242-13393a651429', // Galactic Center
-        '1516331134811-38ba28169123', // Blue Space Cloud
-        '1475275083422-b77da1c0d4ce', // Vibrant Stars
-        '1504333638930-c9e99a221f31', // Atmospheric Starry Night
-        '1534067783941-51c9c23ecfd3'  // Dark Cosmic Dust
+        '1446776811953-b23d57bd21aa', '1464802686167-b939a6910659', '1506318129717-c15d42e520c1',
+        '1446941611767-33028656816b', '1541450805168-5b71d9bc1013', '1451187580242-13393a651429',
+        '1516331134811-38ba28169123', '1475275083422-b77da1c0d4ce', '1504333638930-c9e99a221f31',
+        '1534067783941-51c9c23ecfd3', '1462331940025-496dfbfc7564', '1462332468506-4a004eb651c3',
+        '1419242902c1e-0eb41df928a6', '1446776899648-aa78eefe8575', '1478760329108-5c3ed9d495a0'
     ];
 
     const isInputPage = !!document.getElementById("fortuneBtn");
-    let imageUrl = sessionStorage.getItem('saju_bg_url');
+    let currentUrl = sessionStorage.getItem('saju_bg_url');
+    let currentId = sessionStorage.getItem('saju_bg_id');
+    let newId = currentId;
 
-    // If on input page, or if no background is set yet, pick a new random one
-    if (isInputPage || !imageUrl) {
-        const randomId = spaceImages[Math.floor(Math.random() * spaceImages.length)];
-        const timestamp = new Date().getTime(); // True randomness for every load
-        imageUrl = `https://images.unsplash.com/photo-${randomId}?auto=format&fit=crop&q=80&w=1920&random=${timestamp}`;
-        sessionStorage.setItem('saju_bg_url', imageUrl);
+    // Always pick a new random ID if on input page
+    if (isInputPage || !currentUrl) {
+        // Try to pick a different ID than the current one to ensure it "changes"
+        do {
+            newId = spaceImages[Math.floor(Math.random() * spaceImages.length)];
+        } while (spaceImages.length > 1 && newId === currentId);
+
+        const timestamp = new Date().getTime();
+        const newUrl = `https://images.unsplash.com/photo-${newId}?auto=format&fit=crop&q=80&w=1920&random=${timestamp}`;
+
+        sessionStorage.setItem('saju_bg_url', newUrl);
+        sessionStorage.setItem('saju_bg_id', newId);
+        currentUrl = newUrl;
     }
 
-    // Preload image to avoid white flash or sudden jump
+    // Preload and apply
     const img = new Image();
     img.onload = () => {
-        bgContainer.style.backgroundImage = `url('${imageUrl}')`;
-        bgContainer.style.opacity = '1';
+        bgContainer.style.backgroundImage = `url('${currentUrl}')`;
+        // Use a short delay or requestAnimationFrame for smoother fade-in
+        requestAnimationFrame(() => {
+            bgContainer.style.opacity = '1';
+        });
     };
     img.onerror = () => {
-        const fallbackUrl = 'https://images.unsplash.com/photo-1464802686167-b939a6910659?auto=format&fit=crop&q=80&w=1920';
-        bgContainer.style.backgroundImage = `url('${fallbackUrl}')`;
+        const fallbackId = '1464802686167-b939a6910659';
+        bgContainer.style.backgroundImage = `url('https://images.unsplash.com/photo-${fallbackId}?auto=format&fit=crop&q=80&w=1920')`;
         bgContainer.style.opacity = '1';
     };
-    img.src = imageUrl;
+    img.src = currentUrl;
 }
 
 // ========================================
