@@ -273,10 +273,9 @@ function renderSummaryView(container, data) {
 function renderLayer1(birth, time, pillars) {
     const p = pillars;
     return `
-        <div class="layer" onclick="showDetailView('layer1')" style="cursor:pointer;">
-            <h2 style="color:var(--accent);">📅 제1장. 천문 역법</h2>
-            <p><strong>양력 생년월일:</strong> ${birth}</p>
-            <p><strong>태어난 시간:</strong> ${time}</p>
+        <div class="layer" onclick="showDetailView('layer1')" style="cursor:pointer; border-left: 4px solid var(--accent);">
+            <h2 style="color:var(--accent);">🔭 제1장. 천문 역법</h2>
+            <p class="academic-note">태어난 순간의 천문 좌표를 60갑자 기하학으로 변환한 데이터입니다.</p>
             <div class="saju-grid">
                 <div class="pillar">
                     <div class="pillar-label">시주 (時柱)</div>
@@ -299,15 +298,30 @@ function renderLayer1(birth, time, pillars) {
                     <div class="pillar-hangul">${p.year.data.hangul}${p.year.branchData.hangul}</div>
                 </div>
             </div>
-            <p style="margin-top:15px; color:var(--text-muted); font-size:0.9rem;">💡 클릭하여 상세 보기</p>
+            <p style="margin-top:10px; font-size:0.85rem; color:#aaa;">📍 양력: ${birth} | 시간: ${time}</p>
         </div>
     `;
 }
 
 function renderLayer2(ohaengAnalysis, ohaengNarrative) {
+    const eCounts = ohaengAnalysis.counts;
+    const totalEnergy = Object.values(eCounts).reduce((a, b) => a + b, 0);
+
+    const elementBar = Object.keys(eCounts).map(el => {
+        const percent = (eCounts[el] / totalEnergy) * 100;
+        if (percent === 0) return '';
+        return `<div style="width:${percent}%; background:${window.ELEMENT_TRAITS[el].color}; height:100%;"></div>`;
+    }).join('');
+
     return `
-        <div class="layer" onclick="showDetailView('layer2')" style="cursor:pointer;">
-            <h2 style="color:#4CAF50;">🌳 제2장. 음양오행</h2>
+        <div class="layer" onclick="showDetailView('layer2')" style="cursor:pointer; border-left: 4px solid #4CAF50;">
+            <h2 style="color:#4CAF50;">🌳 제2장. 음양오행 에너지</h2>
+            <p class="academic-note">타고난 5가지 에너지(오행)의 분포와 균형을 분석합니다.</p>
+            
+            <div style="height:12px; display:flex; border-radius:6px; overflow:hidden; margin:15px 0; background:#333;">
+                ${elementBar}
+            </div>
+
             <div class="interpretation-card">
                 <h4>${ohaengNarrative.yinyang.title}</h4>
                 <p>${ohaengNarrative.yinyang.text}</p>
@@ -316,7 +330,6 @@ function renderLayer2(ohaengAnalysis, ohaengNarrative) {
                 <h4>${ohaengNarrative.dominant.title}</h4>
                 <p>${ohaengNarrative.dominant.text}</p>
             </div>
-            <p style="margin-top:15px; color:var(--text-muted); font-size:0.9rem;">💡 클릭하여 상세 보기</p>
         </div>
     `;
 }
@@ -326,33 +339,30 @@ function renderLayer3(pillars, rawTenGods, narrative) {
     const p = pillars;
 
     return `
-        <div class="layer" onclick="showDetailView('layer3')" style="cursor:pointer;">
+        <div class="layer" onclick="showDetailView('layer3')" style="cursor:pointer; border-left: 4px solid #2196F3;">
             <h2 style="color:#2196F3;">🎯 제3장. 명리학적 구조</h2>
+            <p class="academic-note">자아와 타인, 사회를 대하는 당신의 심리적 프레임을 해석합니다.</p>
             
-            <div class="saju-grid">
+            <div class="saju-grid" style="margin-bottom:15px;">
                 <div class="pillar">
-                    <div class="pillar-label">시주 (時柱)</div>
                     <div class="ten-god-label">${getFriendlyTerm(rawTenGods.hourStem).title.split(' ')[0]}</div>
                     <div class="pillar-value">${p.hour.data.hanja}</div>
                     <div class="ten-god-label">${getFriendlyTerm(rawTenGods.hourBranch).title.split(' ')[0]}</div>
                     <div class="pillar-value">${p.hour.branchData.hanja}</div>
                 </div>
                 <div class="pillar highlight">
-                    <div class="pillar-label">일주 (日柱) ★</div>
                     <div class="ten-god-label" style="color:var(--accent)">본원</div>
                     <div class="pillar-value">${p.day.data.hanja}</div>
                     <div class="ten-god-label">${getFriendlyTerm(rawTenGods.dayBranch).title.split(' ')[0]}</div>
                     <div class="pillar-value">${p.day.branchData.hanja}</div>
                 </div>
                 <div class="pillar">
-                    <div class="pillar-label">월주 (月柱)</div>
                     <div class="ten-god-label">${getFriendlyTerm(rawTenGods.monthStem).title.split(' ')[0]}</div>
                     <div class="pillar-value">${p.month.data.hanja}</div>
                     <div class="ten-god-label">${getFriendlyTerm(rawTenGods.monthBranch).title.split(' ')[0]}</div>
                     <div class="pillar-value">${p.month.branchData.hanja}</div>
                 </div>
                 <div class="pillar">
-                    <div class="pillar-label">년주 (年柱)</div>
                     <div class="ten-god-label">${getFriendlyTerm(rawTenGods.yearStem).title.split(' ')[0]}</div>
                     <div class="pillar-value">${p.year.data.hanja}</div>
                     <div class="ten-god-label">${getFriendlyTerm(rawTenGods.yearBranch).title.split(' ')[0]}</div>
@@ -368,45 +378,32 @@ function renderLayer3(pillars, rawTenGods, narrative) {
                 <h4>${narrative.action.title}</h4>
                 <p>${narrative.action.text}</p>
             </div>
-            <div class="interpretation-card">
-                <h4>${narrative.social.title}</h4>
-                <p>${narrative.social.text}</p>
-            </div>
-            <p style="margin-top:15px; color:var(--text-muted); font-size:0.9rem;">💡 클릭하여 상세 보기</p>
         </div>
     `;
 }
 
-function renderLayer4(pillars, rawTenGods, daewoonList) {
+function renderLayer4(pillars, rawTenGods, ohaengAnalysis, daewoonList) {
     const dayElName = pillars.day.data.element;
-    const myElement = window.Constants.ELEMENT_TRAITS[dayElName];
+    const myElement = window.ELEMENT_TRAITS[dayElName];
     const monthBranchTenGod = window.NarrativeGenerator.getFriendlyTerm(rawTenGods.monthBranch);
 
     return `
         <div class="layer" onclick="showDetailView('layer4')" style="cursor:pointer; border-left: 4px solid #9C27B0;">
-            <h2 style="color:#9C27B0;">🌍 제4장. 현실 연결 (Reality Connection)</h2>
-            <p class="academic-note">
-                사주 구조가 실제 현실에서 어떤 <strong>성격 유형과 사회적 행동</strong>으로 나타나는지 통계적으로 해석합니다.
-            </p>
+            <h2 style="color:#9C27B0;">🌍 제4장. 현실 연결</h2>
+            <p class="academic-note">실제 삶의 환경과 직업, 10년 주기 운의 흐름을 분석합니다.</p>
 
             <div class="interpretation-card">
-                <h4>🧘 자아 정체성 (Identity)</h4>
-                <p>
-                    당신은 <strong>${myElement.name}</strong>의 에너지를 핵심으로 합니다. 
-                    이는 <strong>${myElement.trait}</strong>의 가치를 가장 중요하게 여기는 성향으로 나타납니다.
-                </p>
+                <h4>🧘 자아 정체성</h4>
+                <p>당신은 <strong>${myElement.name}</strong>의 에너지를 핵심으로 <strong>${myElement.trait}</strong>의 가치를 추구합니다.</p>
             </div>
 
             <div class="interpretation-card">
-                <h4>💼 사회적 적성 (Career & Social)</h4>
-                <p>
-                    사회 활동에서는 <strong>${monthBranchTenGod.title}</strong>의 특성이 두드러집니다.
-                    <br>${monthBranchTenGod.desc}의 모습으로 타인에게 비춰지며 활약합니다.
-                </p>
+                <h4>💼 사회적 성공 전략</h4>
+                <p>사회활동에서는 <strong>${monthBranchTenGod.title}</strong>의 강점을 발휘하여 활약하는 것이 유리합니다.</p>
             </div>
 
             <div style="margin-top:15px;">
-                <h4 style="font-size:0.85rem; color:var(--text-muted); margin-bottom:10px;">📉 대운의 흐름 (Life Cycle)</h4>
+                <h4 style="font-size:0.85rem; color:var(--text-muted); margin-bottom:10px;">📉 대운의 흐름</h4>
                 <div style="display:flex; overflow-x:auto; gap:8px; padding-bottom:10px;">
                     ${daewoonList.map(d => `
                         <div style="background:rgba(255,255,255,0.05); padding:8px 12px; border-radius:8px; text-align:center; min-width:70px; border:1px solid rgba(255,255,255,0.1);">
@@ -416,38 +413,36 @@ function renderLayer4(pillars, rawTenGods, daewoonList) {
                     `).join('')}
                 </div>
             </div>
-            <p style="margin-top:10px; color:var(--text-muted); font-size:0.8rem;">💡 클릭하여 상세 보기</p>
         </div>
     `;
 }
 
-function renderLayer5() {
+function renderLayer5(specialThemes) {
     return `
-        <div class="layer" onclick="showDetailView('layer5')" style="cursor:pointer; border-left: 4px solid #FF9800; background: rgba(255,152,0,0.05);">
+        <div class="layer" onclick="showDetailView('layer5')" style="cursor:pointer; border-left: 4px solid #FF9800;">
             <h2 style="color:#FF9800;">💎 제5장. 운세 정밀 분석</h2>
-            <p class="academic-note">
-                살아가면서 가장 중요한 3대 테마 <strong>[재물, 건강, 관계]</strong>를 집중적으로 분석한 시크릿 리포트입니다.
-            </p>
+            <p class="academic-note">재물, 건강, 관계 등 당신의 삶을 구성하는 핵심 테마별 리포트입니다.</p>
+            
             <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;">
-                <span class="badge">💰 재물을 부르는 법</span>
-                <span class="badge">💪 선천적 건강 관리</span>
-                <span class="badge">❤️ 관계의 역학</span>
+                <span class="badge" style="background:rgba(255,152,0,0.2); color:#FF9800; border:1px solid rgba(255,152,0,0.3);">💰 재물 그릇</span>
+                <span class="badge" style="background:rgba(76,175,80,0.2); color:#4CAF50; border:1px solid rgba(76,175,80,0.3);">💪 선천 건강</span>
+                <span class="badge" style="background:rgba(33,150,243,0.2); color:#2196F3; border:1px solid rgba(33,150,243,0.3);">❤️ 관계의 역학</span>
             </div>
-            <p style="margin-top:15px; color:var(--text-muted); font-size:0.8rem;">💡 클릭하여 시크릿 리포트 열기</p>
+            <p style="margin-top:15px; color:var(--text-muted); font-size:0.8rem;">💡 클릭하여 정밀 리포트 보기</p>
         </div>
     `;
 }
 
 function renderAppendix() {
     return `
-        <div class="layer-section" style="border-left: 4px solid #607D8B; background: rgba(0,0,0,0.3); margin-top: 30px;">
-            <h3 class="layer-title" style="color: #B0BEC5; border-bottom: 1px solid rgba(176,190,197,0.3);">[부록] 분석 방법론 (Methodology)</h3>
+        <div class="layer-section" style="border-left: 4px solid #607D8B; background: rgba(0,0,0,0.3); margin-top: 30px; padding:20px; border-radius:12px;">
+            <h3 class="layer-title" style="color: #B0BEC5; border-bottom: 1px solid rgba(176,190,197,0.3); padding-bottom:10px; margin-top:0;">[부록] 분석 방법론 (Methodology)</h3>
             <div style="font-size: 0.85rem; color: #cfd8dc; line-height: 1.6;">
                 <p><strong>1. 천문학적 근거 (Astronomy)</strong><br>
-                본 결과는 태양의 황도 좌표(Solar Longitude)를 15도 단위로 정밀하게 계산한 24절기를 기준으로 산출되었습니다. 이는 단순 음력과 달리 오차 없는 태양력을 따릅니다.</p>
+                본 리포트는 태양의 황도 좌표(Solar Longitude)를 15도 단위로 정밀하게 계산한 24절기를 기준으로 산출되었습니다.</p>
                 
-                <p style="margin-top:10px;"><strong>2. 오행 통계학 (System Statistics)</strong><br>
-                성격과 적성 분석은 동양의 기상학이자 인문 통계학인 <strong>자평명리학(Ziping Myungri)</strong> 이론을 현대적 언어로 재해석한 것입니다. 이는 결정된 운명이 아닌, 타고난 기질적 경향성(Propensity)을 의미합니다.</p>
+                <p style="margin-top:10px;"><strong>2. 자평명리학 (System Statistics)</strong><br>
+                성격과 적성 분석은 동양의 기상학이자 인문 통계학인 <strong>자평명리학(Ziping Myungri)</strong> 이론을 현대적으로 재해석한 것입니다.</p>
             </div>
         </div>
     `;

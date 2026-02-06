@@ -210,10 +210,13 @@ const NarrativeGenerator = {
      * @param {Object} narrativeDB - 내러티브 데이터베이스
      * @returns {string} HTML 문자열
      */
-    getCareerAdvice(element, tenGod, careerData, narrativeDB) {
-        const jobs = careerData[element] || "자유 전문직";
+    getCareerAdvice(element, tenGod, careerData = null, narrativeDB = null) {
+        const cData = careerData || window.EMBEDDED_DATA.careerAdvice;
+        const nDB = narrativeDB || window.EMBEDDED_DATA.narratives;
+
+        const jobs = cData[element] || "자유 전문직";
         const key = tenGod.split(' ')[0];
-        const action = narrativeDB[key] ? narrativeDB[key].action : "자유롭게 활동";
+        const action = nDB[key] ? nDB[key].action : "자유롭게 활동";
 
         return `<strong>추천 분야:</strong> ${jobs} 관련 업종.<br>
                 <strong>직무 스타일:</strong> ${action}`;

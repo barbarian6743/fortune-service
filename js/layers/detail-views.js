@@ -191,29 +191,13 @@ const LayerDetailViews = {
                         <p>가장 활발하게 활동하는 시기의 사회적 환경입니다. 당신은 사회에서 <strong>${window.NarrativeGenerator.getSocialNarrative(rawTenGods.monthBranch, window.EMBEDDED_DATA.narratives)}</strong> 스타일로 성공을 추구해야 합니다.</p>
                     </div>
 
-                    <div class="detail-view">
-                <h2 class="detail-title">🌍 제4장. 현실 연결 심층 통계</h2>
-                <div class="detail-content">
                     <div class="detail-section">
-                        <h3>1. 성격 5요인 (Big 5) 추정</h3>
-                        <p>사주 구조로 본 현대 심리학적 특성입니다.</p>
-                        <ul style="list-style:none; padding:0;">
-                            <li style="margin-bottom:8px;">🧠 <strong>개방성:</strong> ${ohaengAnalysis.counts.Fire + ohaengAnalysis.counts.Wood > 2 ? '매우 높음 (창의적, 모험적)' : '보통 (실용적)'}</li>
-                            <li style="margin-bottom:8px;">📋 <strong>성실성:</strong> ${ohaengAnalysis.counts.Metal + ohaengAnalysis.counts.Earth > 2 ? '매우 높음 (계획적, 꼼꼼함)' : '유동적 (즉흥적)'}</li>
-                            <li style="margin-bottom:8px;">🗣️ <strong>외향성:</strong> ${ohaengAnalysis.polarities.Yang > ohaengAnalysis.polarities.Yin ? '높음 (사교적)' : '낮음 (신중함)'}</li>
-                            <li style="margin-bottom:8px;">🤝 <strong>친화성:</strong> ${ohaengAnalysis.counts.Earth + ohaengAnalysis.counts.Water > 2 ? '높음 (이타적, 협력적)' : '독립적 (자기중심적)'}</li>
-                        </ul>
-                    </div>
-
-                    <div class="detail-section">
-                        <h3>2. 직업 적성 가이드</h3>
-                        <p>당신의 타고난 강점과 사회적 환경을 결합한 추천입니다.</p>
-                        <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:12px; margin-top:10px;">
-                            ${window.NarrativeGenerator.getCareerAdvice(pillars.day.data.element, rawTenGods.monthBranch)}
+                        <h3 style="color:var(--accent);">🎯 성취 및 사회 활동 스타일</h3>
+                        <p>${narrative.social.text}</p>
+                        <div style="margin-top:10px; padding:12px; background:rgba(33,150,243,0.05); border-radius:8px;">
+                            <strong>사회궁 전략:</strong> ${getFriendlyTerm(rawTenGods.monthBranch).desc}
                         </div>
                     </div>
-                </div>
-            </div>
                     <div class="detail-section">
                         <h4 style="color:var(--accent);">3. 중년/본원 (자아/배우자) - 일주</h4>
                         <p><strong>${pillars.day.data.hanja}${pillars.day.branchData.hanja} (${getFriendlyTerm(rawTenGods.dayBranch).title})</strong></p>
@@ -317,6 +301,7 @@ const LayerDetailViews = {
 
         // Helper function to analyze compatibility with birth chart
         const analyzeDaewoonCompatibility = (dwElement, birthOhaeng) => {
+            if (!birthOhaeng || !birthOhaeng.counts) return { level: '보통', color: '#FFC107', description: '평범한 시기입니다.' };
             const count = birthOhaeng.counts[dwElement];
             if (count === 0) {
                 return {
@@ -330,14 +315,8 @@ const LayerDetailViews = {
                     color: '#FF5722',
                     description: '이미 과한 오행이 더 들어오므로 <strong>조심해야 할 시기</strong>입니다.'
                 };
-            } else if (count === 1 || count === 2) {
-                return {
-                    level: '보통',
-                    color: '#FFC107',
-                    description: '적당한 오행이 들어오는 <strong>평범한 시기</strong>입니다. 자신의 노력이 중요합니다.'
-                };
             }
-            return { level: '보통', color: '#FFC107', description: '평범한 시기입니다.' };
+            return { level: '보통', color: '#FFC107', description: '적당한 오행이 들어오는 시기입니다.' };
         };
 
         return `
@@ -351,11 +330,26 @@ const LayerDetailViews = {
                     </p>
                     <p>
                         이는 ${myElement.trait}의 가치를 가장 중요하게 여기는 성향으로 나타납니다.
-                        본질적으로 ${myElement.trait.split('/')[1]}하는 삶을 지향하며, 이것이 당신의 핵심 에너지입니다.
                     </p>
                     <div style="margin-top:15px; padding:15px; background:rgba(156,39,176,0.1); border-left:3px solid #9C27B0; border-radius:4px;">
-                        <strong>💡 핵심 특성:</strong> ${myElement.trait}을 추구하는 성향이 강하며, 
-                        이러한 가치관이 인생의 중요한 선택에 영향을 미칩니다.
+                        <strong>💡 핵심 특성:</strong> ${myElement.trait}을 추구하며 창의적이고 발전적인 삶을 지향합니다.
+                    </div>
+                </div>
+
+                <div class="interpretation-card">
+                    <h3>📊 성격 5요인 (Big 5) 추정</h3>
+                    <ul style="list-style:none; padding:0;">
+                        <li style="margin-bottom:8px;">🧠 <strong>개방성:</strong> ${ohaengAnalysis.counts.Fire + ohaengAnalysis.counts.Wood > 2 ? '매우 높음' : '보통'}</li>
+                        <li style="margin-bottom:8px;">📋 <strong>성실성:</strong> ${ohaengAnalysis.counts.Metal + ohaengAnalysis.counts.Earth > 2 ? '매우 높음' : '유동적'}</li>
+                        <li style="margin-bottom:8px;">🗣️ <strong>외향성:</strong> ${ohaengAnalysis.polarities.Yang > ohaengAnalysis.polarities.Yin ? '높음' : '신중함'}</li>
+                        <li style="margin-bottom:8px;">🤝 <strong>친화성:</strong> ${ohaengAnalysis.counts.Earth + ohaengAnalysis.counts.Water > 2 ? '높음' : '독립적'}</li>
+                    </ul>
+                </div>
+
+                <div class="interpretation-card">
+                    <h3>💼 직업 적성 가이드</h3>
+                    <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:8px;">
+                        ${window.NarrativeGenerator.getCareerAdvice(pillars.day.data.element, rawTenGods.monthBranch)}
                     </div>
                 </div>
 
