@@ -103,6 +103,29 @@ h1 {
     font-weight: 300;
 }
 
+.header-top {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: -10px;
+}
+
+.lang-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-muted);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.lang-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
 input,
 select {
     width: 100%;

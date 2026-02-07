@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <script src="js/utils/i18n.js"></script>
 </head>
 
 <body>
@@ -18,42 +19,39 @@
     <div class="background-stars"></div>
     <div class="container">
         <header>
-            <h1>🔮 신비한 운세</h1>
-            <p class="subtitle">별들이 말해주는 당신의 오늘</p>
+            <div class="header-top">
+                <button id="langToggle" class="lang-btn">EN</button>
+            </div>
+            <h1 data-i18n="title">🔮 신비한 운세</h1>
+            <p class="subtitle" data-i18n="subtitle">별들이 말해주는 당신의 오늘</p>
         </header>
 
         <div class="input-group">
-            <label for="gender">성별</label>
+            <label for="gender" data-i18n="label_gender">성별</label>
             <div class="select-wrapper">
                 <select id="gender">
-                    <option value="" disabled selected>선택해주세요</option>
-                    <option value="male">남성 👨</option>
-                    <option value="female">여성 👩</option>
+                    <option value="" disabled selected data-i18n="gender_select">선택해주세요</option>
+                    <option value="male" data-i18n="gender_male">남성 👨</option>
+                    <option value="female" data-i18n="gender_female">여성 👩</option>
                 </select>
             </div>
         </div>
 
         <div class="input-group">
-            <label>생년월일</label>
-
-            <!-- Calendar Type Toggle -->
+            <label data-i18n="label_birth">생년월일</label>
             <div class="calendar-toggle-group">
-                <button type="button" id="solarBtn" class="calendar-toggle active">
-                    ☀️ 양력
-                </button>
-                <button type="button" id="lunarBtn" class="calendar-toggle">
-                    🌙 음력
-                </button>
+                <button type="button" id="solarBtn" class="calendar-toggle active" data-i18n="btn_solar">☀️ 양력</button>
+                <button type="button" id="lunarBtn" class="calendar-toggle" data-i18n="btn_lunar">🌙 음력</button>
             </div>
             <input type="hidden" id="calendarType" value="solar">
 
             <!-- Date Inputs -->
             <div class="date-select-grid">
                 <select id="birthYear">
-                    <option value="" disabled selected>년도</option>
+                    <option value="" disabled selected data-i18n="option_year">년도</option>
                 </select>
                 <select id="birthMonth">
-                    <option value="" disabled selected>월</option>
+                    <option value="" disabled selected data-i18n="option_month">월</option>
                     <option value="1">1월</option>
                     <option value="2">2월</option>
                     <option value="3">3월</option>
@@ -68,28 +66,27 @@
                     <option value="12">12월</option>
                 </select>
                 <select id="birthDay">
-                    <option value="" disabled selected>일</option>
+                    <option value="" disabled selected data-i18n="option_day">일</option>
                 </select>
             </div>
-            <small id="calendarHint" class="subtitle" style="margin-top:5px; text-align:left; display:block;">
+            <small id="calendarHint" class="subtitle" style="margin-top:5px; text-align:left; display:block;" data-i18n="hint_solar">
                 ☀️ 양력으로 입력해주세요
             </small>
 
             <!-- Leap Month Option (Hidden by default) -->
             <div id="leapMonthContainer" style="display:none; text-align:left; margin-top:10px;">
-                <label
-                    style="display:flex; align-items:center; cursor:pointer; font-size:0.9rem; color:var(--text-muted);">
+                <label style="display:flex; align-items:center; cursor:pointer; font-size:0.9rem; color:var(--text-muted);">
                     <input type="checkbox" id="isLeap" style="width:auto; margin-bottom:0; margin-right:8px;">
-                    🌙 윤달(Leap Month) 여부
+                    <span data-i18n="leap_month">🌙 윤달(Leap Month) 여부</span>
                 </label>
             </div>
         </div>
 
         <div class="input-group">
-            <label>태어난 시간</label>
+            <label data-i18n="label_time">태어난 시간</label>
             <select id="birthHour" style="width:100%;">
-                <option value="" disabled selected>시간을 선택하세요</option>
-                <option value="0">0시 (자시 子時) - 밤 11:30 ~ 새벽 1:30</option>
+                <option value="" disabled selected data-i18n="time_select">시간을 선택하세요</option>
+                <option value="0" data-i18n="hour_0">0시 (자시 子時) - 밤 11:30 ~ 새벽 1:30</option>
                 <option value="1">1시 (축시 丑時) - 새벽 1:30 ~ 3:30</option>
                 <option value="2">2시 (축시 丑時) - 새벽 1:30 ~ 3:30</option>
                 <option value="3">3시 (인시 寅時) - 새벽 3:30 ~ 5:30</option>
@@ -114,13 +111,13 @@
                 <option value="22">22시 (해시 亥時) - 밤 21:30 ~ 23:30</option>
                 <option value="23">23시 (자시 子時) - 밤 11:30 ~ 새벽 1:30</option>
             </select>
-            <small style="color:var(--text-muted); font-size:0.85rem; margin-top:5px; display:block;">
+            <small style="color:var(--text-muted); font-size:0.85rem; margin-top:5px; display:block;" data-i18n="time_hint">
                 ⏰ 정확한 시간을 모르는 경우 대략적인 시간을 선택하세요
             </small>
         </div>
 
         <button id="fortuneBtn" class="magic-btn">
-            <span class="btn-text">운세 확인하기</span>
+            <span class="btn-text" data-i18n="btn_confirm">운세 확인하기</span>
             <span class="btn-particles">✨</span>
         </button>
 

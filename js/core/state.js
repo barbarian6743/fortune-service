@@ -10,6 +10,7 @@ class FortuneState {
         this.daewoon = null;
         this.narrative = null;
         this.themes = null;
+        this.rawData = null;
         this.cachedSummaryHtml = null;
     }
 
@@ -20,6 +21,7 @@ class FortuneState {
     setDaewoon(daewoon) { this.daewoon = daewoon; }
     setNarrative(narrative) { this.narrative = narrative; }
     setThemes(themes) { this.themes = themes; }
+    setRawData(data) { this.rawData = data; }
     setCachedSummary(html) { this.cachedSummaryHtml = html; }
 
     // Getters
@@ -29,6 +31,7 @@ class FortuneState {
     getDaewoon() { return this.daewoon; }
     getNarrative() { return this.narrative; }
     getThemes() { return this.themes; }
+    getRawData() { return this.rawData; }
     getCachedSummary() { return this.cachedSummaryHtml; }
 
     // Reset
@@ -39,6 +42,7 @@ class FortuneState {
         this.daewoon = null;
         this.narrative = null;
         this.themes = null;
+        this.rawData = null;
         this.cachedSummaryHtml = null;
     }
 

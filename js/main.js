@@ -9,10 +9,77 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     initDynamicBackground();
+    // Initialize i18n
+    if (window.i18n) window.i18n.init();
+
     if (document.getElementById("fortuneBtn")) {
         initInputPage();
     } else if (document.getElementById("result")) {
         initResultPage();
+    }
+
+    // Language toggle handler
+    const langToggle = document.getElementById('langToggle');
+    if (langToggle && window.i18n) {
+        langToggle.addEventListener('click', async () => {
+            const newLang = window.i18n.currentLang === 'ko' ? 'en' : 'ko';
+            window.i18n.setLanguage(newLang);
+
+            // Re-render result if on result page
+            const container = document.getElementById("result");
+            if (container && !container.classList.contains('hidden')) {
+                const state = window.FortuneState;
+                if (state && state.getPillars()) {
+                    // 1. Regenerate narratives with new language
+                    const rawData = state.getRawData() || await window.DataLoader.loadAll();
+                    const pillars = state.getPillars();
+                    const ohaengAnalysis = state.getOhaeng();
+                    const rawTenGods = state.getTenGods();
+
+                    const narrative = await window.NarrativeGenerator.generateMyungriNarrative(rawTenGods, rawData.narratives);
+                    const ohaengNarrative = window.NarrativeGenerator.generateOhaengNarrative(ohaengAnalysis);
+                    const specialThemes = await window.NarrativeGenerator.generateSpecialThemeAnalysis(
+                        pillars, rawTenGods, ohaengAnalysis, rawData.healthData
+                    );
+
+                    // 2. Update state
+                    state.setNarrative({ rawTenGods, narrative, ohaengNarrative });
+                    state.setThemes(specialThemes);
+
+                    // 3. Re-render current view
+                    // Check if we are in a detail view by looking for .back-btn or similar
+                    const isDetailView = !!container.querySelector('.back-btn');
+
+                    if (isDetailView) {
+                        // We need to know WHICH detail view.
+                        // For now, let's keep it simple and just re-render summary,
+                        // but stay in detail if we can identify it.
+                        // Actually, restoreSummaryView uses cachedSummaryHtml,
+                        // so we must clear it.
+                        state.setCachedSummary(null);
+
+                        // If we are in detail, the user has to click back anyway.
+                        // Let's just re-render summary and inform the state.
+                        renderSummaryView(container, {
+                            birth: new URLSearchParams(window.location.search).get('birth'),
+                            time: new URLSearchParams(window.location.search).get('time'),
+                            pillars, ohaengAnalysis, ohaengNarrative, rawTenGods, narrative,
+                            daewoonList: state.getDaewoon(),
+                            specialThemes
+                        });
+                    } else {
+                        renderSummaryView(container, {
+                            birth: new URLSearchParams(window.location.search).get('birth'),
+                            time: new URLSearchParams(window.location.search).get('time'),
+                            pillars, ohaengAnalysis, ohaengNarrative, rawTenGods, narrative,
+                            daewoonList: state.getDaewoon(),
+                            specialThemes
+                        });
+                    }
+                    state.setCachedSummary(container.innerHTML);
+                }
+            }
+        });
     }
 });
 
@@ -100,7 +167,7 @@ function initInputPage() {
     for (let year = currentYear; year >= 1920; year--) {
         const option = document.createElement('option');
         option.value = year;
-        option.textContent = `${year}년`;
+        option.textContent = `${year}${window.i18n ? (window.i18n.currentLang === 'ko' ? '년' : '') : '년'}`;
         yearSelect.appendChild(option);
     }
 
@@ -116,7 +183,7 @@ function initInputPage() {
         calendarTypeInput.value = "solar";
         solarBtn.classList.add("active");
         lunarBtn.classList.remove("active");
-        calendarHint.innerHTML = "☀️ 양력으로 입력해주세요";
+        calendarHint.innerHTML = window.i18n ? window.i18n.t('hint_solar') : "☀️ 양력으로 입력해주세요";
         leapMonthContainer.style.display = "none";
     });
 
@@ -124,7 +191,7 @@ function initInputPage() {
         calendarTypeInput.value = "lunar";
         lunarBtn.classList.add("active");
         solarBtn.classList.remove("active");
-        calendarHint.innerHTML = "🌙 음력으로 입력해주세요 (양력으로 자동 변환됩니다)";
+        calendarHint.innerHTML = window.i18n ? window.i18n.t('hint_lunar') : "🌙 음력으로 입력해주세요 (양력으로 자동 변환됩니다)";
         leapMonthContainer.style.display = "block";
     });
 
@@ -148,7 +215,7 @@ function initInputPage() {
         for (let i = 1; i <= daysInMonth; i++) {
             const option = document.createElement('option');
             option.value = i;
-            option.textContent = `${i}일`;
+            option.textContent = `${i}${window.i18n ? (window.i18n.currentLang === 'ko' ? '일' : '') : '일'}`;
             daySelect.appendChild(option);
         }
     }
@@ -185,7 +252,7 @@ function initInputPage() {
 
                 console.log(`Lunar (${year}-${month}-${day}${isLeap ? ' Leap' : ''}) -> Solar (${finalYear}-${finalMonth}-${finalDay})`);
             } catch (e) {
-                alert("⚠️ 유효하지 않은 음력 날짜입니다.");
+                alert(window.i18n ? window.i18n.t('alert_invalid_lunar') : "⚠️ 유효하지 않은 음력 날짜입니다.");
                 return;
             }
         }
@@ -206,7 +273,7 @@ function initInputPage() {
         const validation = window.Validator.validateAll(inputs);
 
         if (!validation.valid) {
-            alert("⚠️ " + validation.errors.join('\n'));
+            alert("⚠️ " + (window.i18n && window.i18n.currentLang === 'en' ? "Please fill in all required fields." : validation.errors.join('\n')));
             return;
         }
 
@@ -227,7 +294,7 @@ function initResultPage() {
     const time = params.get('time');
 
     if (!gender || !birth || !time) {
-        alert("⚠️ 필수 정보가 누락되었습니다. 다시 입력해주세요.");
+        alert(window.i18n && window.i18n.currentLang === 'en' ? "⚠️ Missing required information. Please enter again." : "⚠️ 필수 정보가 누락되었습니다. 다시 입력해주세요.");
         window.location.href = "index.html";
         return;
     }
@@ -247,7 +314,7 @@ async function calculateAndRender(gender, birth, time, resultBox, loadingBox) {
         resultBox.innerHTML = `
             <div class="loading">
                 <div class="spinner"></div>
-                <p>운세를 계산하고 있습니다...</p>
+                <p data-i18n="loading_text">${window.i18n ? window.i18n.t('loading_text') : '운세를 계산하고 있습니다...'}</p>
             </div>
         `;
 
@@ -294,6 +361,7 @@ async function calculateAndRender(gender, birth, time, resultBox, loadingBox) {
         state.setDaewoon(daewoonList);
         state.setNarrative({ rawTenGods, narrative, ohaengNarrative });
         state.setThemes(specialThemes);
+        state.setRawData(data);
 
         // 5. Render Summary View
         renderSummaryView(resultBox, {
@@ -319,9 +387,9 @@ async function calculateAndRender(gender, birth, time, resultBox, loadingBox) {
         console.error("Fortune calculation error:", error);
         resultBox.innerHTML = `
             <div class="error">
-                <h3>⚠️ 오류 발생</h3>
+                <h3>⚠️ ${window.i18n && window.i18n.currentLang === 'en' ? 'Error Occurred' : '오류 발생'}</h3>
                 <p>${error.message}</p>
-                <button onclick="location.href='index.html'" class="back-btn" style="margin-top:15px;">돌아가기</button>
+                <button onclick="location.href='index.html'" class="back-btn" style="margin-top:15px;">${window.i18n && window.i18n.currentLang === 'en' ? 'Go Back' : '돌아가기'}</button>
             </div>
         `;
         resultBox.classList.remove("hidden");
@@ -365,33 +433,33 @@ function renderLayer1(birth, time, pillars) {
     const p = pillars;
     return `
         <div class="layer" onclick="showDetailView('layer1')" style="cursor:pointer; border-left: 4px solid var(--accent); overflow:hidden;">
-            <h2 style="color:var(--accent);">🔭 제1장. 천문 역법</h2>
-            <p class="academic-note">태어난 순간의 천문 좌표를 60갑자 기하학으로 변환한 데이터입니다.</p>
+            <h2 style="color:var(--accent);" data-i18n="layer1_title">${window.i18n ? window.i18n.t('layer1_title') : '🔭 제1장. 천문 역법'}</h2>
+            <p class="academic-note" data-i18n="layer1_subtitle">${window.i18n ? window.i18n.t('layer1_subtitle') : '태어난 순간의 천문 좌표를 60갑자 기하학으로 변환한 데이터입니다.'}</p>
             <div style="width:100%; overflow-x:auto;">
                 <div class="saju-grid">
                     <div class="pillar">
-                        <div class="pillar-label">시주 (時柱)</div>
+                        <div class="pillar-label" data-i18n="layer1_pillar_hour">${window.i18n ? window.i18n.t('layer1_pillar_hour').split(' ')[0] : '시주'}</div>
                         <div class="pillar-value">${p.hour.data.hanja}${p.hour.branchData.hanja}</div>
                         <div class="pillar-hangul">${p.hour.data.ko}${p.hour.branchData.ko}</div>
                     </div>
                     <div class="pillar highlight">
-                        <div class="pillar-label">일주 (日柱) ★</div>
+                        <div class="pillar-label" data-i18n="layer1_pillar_day">${window.i18n ? window.i18n.t('layer1_pillar_day').split(' ')[0] : '일주'} ★</div>
                         <div class="pillar-value">${p.day.data.hanja}${p.day.branchData.hanja}</div>
                         <div class="pillar-hangul">${p.day.data.ko}${p.day.branchData.ko}</div>
                     </div>
                     <div class="pillar">
-                        <div class="pillar-label">월주 (月柱)</div>
+                        <div class="pillar-label" data-i18n="layer1_pillar_month">${window.i18n ? window.i18n.t('layer1_pillar_month').split(' ')[0] : '월주'}</div>
                         <div class="pillar-value">${p.month.data.hanja}${p.month.branchData.hanja}</div>
                         <div class="pillar-hangul">${p.month.data.ko}${p.month.branchData.ko}</div>
                     </div>
                     <div class="pillar">
-                        <div class="pillar-label">년주 (年柱)</div>
+                        <div class="pillar-label" data-i18n="layer1_pillar_year">${window.i18n ? window.i18n.t('layer1_pillar_year').split(' ')[0] : '년주'}</div>
                         <div class="pillar-value">${p.year.data.hanja}${p.year.branchData.hanja}</div>
                         <div class="pillar-hangul">${p.year.data.ko}${p.year.branchData.ko}</div>
                     </div>
                 </div>
             </div>
-            <p style="margin-top:10px; font-size:0.85rem; color:#aaa;">📍 양력: ${birth} | 시간: ${time}</p>
+            <p style="margin-top:10px; font-size:0.85rem; color:#aaa;">📍 ${window.i18n ? window.i18n.t('btn_solar') : '양력'}: ${birth} | ${window.i18n ? window.i18n.t('label_time') : '시간'}: ${time}</p>
         </div>
     `;
 }
@@ -408,8 +476,8 @@ function renderLayer2(ohaengAnalysis, ohaengNarrative) {
 
     return `
         <div class="layer" onclick="showDetailView('layer2')" style="cursor:pointer; border-left: 4px solid #4CAF50;">
-            <h2 style="color:#4CAF50;">🌳 제2장. 음양오행 에너지</h2>
-            <p class="academic-note">타고난 5가지 에너지(오행)의 분포와 균형을 분석합니다.</p>
+            <h2 style="color:#4CAF50;" data-i18n="layer2_title">${window.i18n ? window.i18n.t('layer2_title') : '🌳 제2장. 음양오행 에너지'}</h2>
+            <p class="academic-note" data-i18n="layer2_subtitle">${window.i18n ? window.i18n.t('layer2_subtitle') : '타고난 5가지 에너지(오행)의 분포와 균형을 분석합니다.'}</p>
             
             <div style="height:12px; display:flex; border-radius:6px; overflow:hidden; margin:15px 0; background:#333;">
                 ${elementBar}
@@ -433,8 +501,8 @@ function renderLayer3(pillars, rawTenGods, narrative) {
 
     return `
         <div class="layer" onclick="showDetailView('layer3')" style="cursor:pointer; border-left: 4px solid #2196F3;">
-            <h2 style="color:#2196F3;">🎯 제3장. 명리학적 구조</h2>
-            <p class="academic-note">자아와 타인, 사회를 대하는 당신의 심리적 프레임을 해석합니다.</p>
+            <h2 style="color:#2196F3;" data-i18n="layer3_title">${window.i18n ? window.i18n.t('layer3_title') : '🎯 제3장. 명리학적 구조'}</h2>
+            <p class="academic-note" data-i18n="layer3_subtitle">${window.i18n ? window.i18n.t('layer3_subtitle') : '자아와 타인, 사회를 대하는 당신의 심리적 프레임을 해석합니다.'}</p>
             
             <div class="saju-grid" style="margin-bottom:15px;">
                 <div class="pillar">
@@ -444,7 +512,7 @@ function renderLayer3(pillars, rawTenGods, narrative) {
                     <div class="pillar-value">${p.hour.branchData.hanja}</div>
                 </div>
                 <div class="pillar highlight">
-                    <div class="ten-god-label" style="color:var(--accent)">본원</div>
+                    <div class="ten-god-label" style="color:var(--accent)" data-i18n="layer3_daymaster">${window.i18n ? window.i18n.t('layer3_daymaster') : '본원'}</div>
                     <div class="pillar-value">${p.day.data.hanja}</div>
                     <div class="ten-god-label">${getFriendlyTerm(rawTenGods.dayBranch).title.split(' ')[0]}</div>
                     <div class="pillar-value">${p.day.branchData.hanja}</div>
@@ -482,25 +550,28 @@ function renderLayer4(pillars, rawTenGods, ohaengAnalysis, daewoonList) {
 
     return `
         <div class="layer" onclick="showDetailView('layer4')" style="cursor:pointer; border-left: 4px solid #9C27B0;">
-            <h2 style="color:#9C27B0;">🌍 제4장. 현실 연결</h2>
-            <p class="academic-note">실제 삶의 환경과 직업, 10년 주기 운의 흐름을 분석합니다.</p>
+            <h2 style="color:#9C27B0;" data-i18n="layer4_title">${window.i18n ? window.i18n.t('layer4_title') : '🌍 제4장. 현실 연결'}</h2>
+            <p class="academic-note" data-i18n="layer4_subtitle">${window.i18n ? window.i18n.t('layer4_subtitle') : '실제 삶의 환경과 직업, 10년 주기 운의 흐름을 분석합니다.'}</p>
 
             <div class="interpretation-card">
-                <h4>🧘 자아 정체성</h4>
-                <p>당신은 <strong>${myElement.name}</strong>의 에너지를 핵심으로 <strong>${myElement.trait}</strong>의 가치를 추구합니다.</p>
+                <h4 data-i18n="layer4_identity_title">${window.i18n ? window.i18n.t('layer4_identity_title') : '🧘 자아 정체성'}</h4>
+                <p>${window.i18n ? window.i18n.t('layer4_identity_desc').replace('{trait}', window.i18n.t(dayElName)) : `당신은 <strong>${myElement.name}</strong>의 에너지를 핵심으로 <strong>${myElement.trait}</strong>의 가치를 추구합니다.`}</p>
             </div>
 
             <div class="interpretation-card">
-                <h4>💼 사회적 성공 전략</h4>
-                <p>사회활동에서는 <strong>${monthBranchTenGod.title}</strong>의 강점을 발휘하여 활약하는 것이 유리합니다.</p>
+                <h4 data-i18n="layer4_career_title">${window.i18n ? window.i18n.t('layer4_career_title') : '💼 사회적 성공 전략'}</h4>
+                <p>${window.i18n ? (window.i18n.currentLang === 'en'
+            ? `In social activities, it is advantageous to manifest the strengths of <strong>${window.i18n.t(monthBranchTenGod.title.split(' ')[0])}</strong>.`
+            : `사회활동에서는 <strong>${monthBranchTenGod.title}</strong>의 강점을 발휘하여 활약하는 것이 유리합니다.`)
+            : `사회활동에서는 <strong>${monthBranchTenGod.title}</strong>의 강점을 발휘하여 활약하는 것이 유리합니다.`}</p>
             </div>
 
             <div style="margin-top:15px;">
-                <h4 style="font-size:0.85rem; color:var(--text-muted); margin-bottom:10px;">📉 대운의 흐름</h4>
+                <h4 style="font-size:0.85rem; color:var(--text-muted); margin-bottom:10px;" data-i18n="layer4_daewoon_title">📉 대운의 흐름</h4>
                 <div style="display:flex; overflow-x:auto; gap:8px; padding-bottom:10px;">
                     ${daewoonList.map(d => `
                         <div style="background:rgba(255,255,255,0.05); padding:8px 12px; border-radius:8px; text-align:center; min-width:70px; border:1px solid rgba(255,255,255,0.1);">
-                            <div style="font-size:0.7rem; color:var(--accent);">${d.age}세~</div>
+                            <div style="font-size:0.7rem; color:var(--accent);">${d.age}${window.i18n && window.i18n.currentLang === 'ko' ? '세' : ''}~</div>
                             <div style="font-weight:bold; font-size:0.9rem;">${d.ganji}</div>
                         </div>
                     `).join('')}
@@ -513,29 +584,28 @@ function renderLayer4(pillars, rawTenGods, ohaengAnalysis, daewoonList) {
 function renderLayer5(specialThemes) {
     return `
         <div class="layer" onclick="showDetailView('layer5')" style="cursor:pointer; border-left: 4px solid #FF9800;">
-            <h2 style="color:#FF9800;">💎 제5장. 운세 정밀 분석</h2>
-            <p class="academic-note">재물, 건강, 관계 등 당신의 삶을 구성하는 핵심 테마별 리포트입니다.</p>
+            <h2 style="color:#FF9800;" data-i18n="layer5_title">${window.i18n ? window.i18n.t('layer5_title') : '💎 제5장. 운세 정밀 분석'}</h2>
+            <p class="academic-note" data-i18n="layer5_subtitle">${window.i18n ? window.i18n.t('layer5_subtitle') : '재물, 건강, 관계 등 당신의 삶을 구성하는 핵심 테마별 리포트입니다.'}</p>
             
             <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;">
-                <span class="badge" style="background:rgba(255,152,0,0.2); color:#FF9800; border:1px solid rgba(255,152,0,0.3);">💰 재물 그릇</span>
-                <span class="badge" style="background:rgba(76,175,80,0.2); color:#4CAF50; border:1px solid rgba(76,175,80,0.3);">💪 선천 건강</span>
-                <span class="badge" style="background:rgba(33,150,243,0.2); color:#2196F3; border:1px solid rgba(33,150,243,0.3);">❤️ 관계의 역학</span>
+                <span class="badge" style="background:rgba(255,152,0,0.2); color:#FF9800; border:1px solid rgba(255,152,0,0.3);" data-i18n="wealth">💰 재물 그릇</span>
+                <span class="badge" style="background:rgba(76,175,80,0.2); color:#4CAF50; border:1px solid rgba(76,175,80,0.3);" data-i18n="health">💪 선천 건강</span>
+                <span class="badge" style="background:rgba(33,150,243,0.2); color:#2196F3; border:1px solid rgba(33,150,243,0.3);" data-i18n="relation">❤️ 관계의 역학</span>
             </div>
-            <p style="margin-top:15px; color:var(--text-muted); font-size:0.8rem;">💡 클릭하여 정밀 리포트 보기</p>
+            <p style="margin-top:15px; color:var(--text-muted); font-size:0.8rem;" data-i18n="layer5_click_hint">${window.i18n && window.i18n.currentLang === 'en' ? '💡 Click for precision report' : '💡 클릭하여 정밀 리포트 보기'}</p>
         </div>
     `;
 }
 
 function renderAppendix() {
+    const i18n = window.i18n;
     return `
         <div class="layer-section" style="border-left: 4px solid #607D8B; background: rgba(0,0,0,0.3); margin-top: 30px; padding:20px; border-radius:12px;">
-            <h3 class="layer-title" style="color: #B0BEC5; border-bottom: 1px solid rgba(176,190,197,0.3); padding-bottom:10px; margin-top:0;">[부록] 분석 방법론 (Methodology)</h3>
+            <h3 class="layer-title" style="color: #B0BEC5; border-bottom: 1px solid rgba(176,190,197,0.3); padding-bottom:10px; margin-top:0;">${i18n ? i18n.t('appendix_title') : '[부록] 분석 방법론 (Methodology)'}</h3>
             <div style="font-size: 0.85rem; color: #cfd8dc; line-height: 1.6;">
-                <p><strong>1. 천문학적 근거 (Astronomy)</strong><br>
-                본 리포트는 태양의 황도 좌표(Solar Longitude)를 15도 단위로 정밀하게 계산한 24절기를 기준으로 산출되었습니다.</p>
+                <p>${i18n ? i18n.t('appendix_astronomy') : '<strong>1. 천문학적 근거 (Astronomy)</strong><br>본 리포트는 태양의 황도 좌표(Solar Longitude)를 15도 단위로 정밀하게 계산한 24절기를 기준으로 산출되었습니다.'}</p>
                 
-                <p style="margin-top:10px;"><strong>2. 자평명리학 (System Statistics)</strong><br>
-                성격과 적성 분석은 동양의 기상학이자 인문 통계학인 <strong>자평명리학(Ziping Myungri)</strong> 이론을 현대적으로 재해석한 것입니다.</p>
+                <p style="margin-top:10px;">${i18n ? i18n.t('appendix_myungri') : '<strong>2. 자평명리학 (System Statistics)</strong><br>성격과 적성 분석은 동양의 기상학이자 인문 통계학인 <strong>자평명리학(Ziping Myungri)</strong> 이론을 현대적으로 재해석한 것입니다.'}</p>
             </div>
         </div>
     `;
@@ -581,7 +651,7 @@ function showDetailView(layerId) {
             detailHtml = window.LayerDetailViews.renderLayer5Detail(themes);
             break;
         default:
-            detailHtml = '<p>알 수 없는 레이어입니다.</p>';
+            detailHtml = `<p>${window.i18n && window.i18n.currentLang === 'en' ? 'Unknown layer.' : '알 수 없는 레이어입니다.'}</p>`;
     }
 
     resultBox.innerHTML = detailHtml;
